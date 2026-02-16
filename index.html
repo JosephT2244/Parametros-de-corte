@@ -1,0 +1,3857 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Torneado - IPN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ipn-guinda: #6d1f41;
+            --ipn-guinda-dark: #4a1529;
+            --ipn-guinda-light: #8b2955;
+            --ipn-white: #ffffff;
+            --ipn-cream: #f5f1e8;
+            --text-dark: #2c2c2c;
+            --text-light: #666666;
+            --border-color: #d4cfc4;
+            --shadow: rgba(109, 31, 65, 0.15);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--ipn-cream);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding-top: 160px; /* espacio para header + nav fijo */
+        }
+
+        /* Header */
+        header {
+            background: var(--ipn-guinda);
+            color: var(--ipn-white);
+            padding: 2rem 0;
+            box-shadow: 0 4px 12px var(--shadow);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .ipn-logo {
+            width: 60px;
+            height: 60px;
+            background: var(--ipn-white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: var(--ipn-guinda);
+            font-size: 1.5rem;
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+
+        h1 {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* Navigation - Mejorada con más espacio */
+        nav {
+            background: var(--ipn-white);
+            border-bottom: 3px solid var(--ipn-guinda);
+            box-shadow: 0 2px 8px var(--shadow);
+            position: fixed;
+            top: 113px; /* AJUSTA según la altura real del header */
+            left: 0;
+            width: 100%;
+            z-index: 99;
+            transition: transform 0.35s ease;
+        }
+
+        nav.hide-nav {
+            transform: translateY(-120%);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            overflow-x: auto;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            padding: 1.5rem 2.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            font-family: 'Roboto', sans-serif;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--ipn-guinda);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--ipn-cream);
+            color: var(--ipn-guinda);
+        }
+
+        .nav-btn:hover::before {
+            transform: scaleX(1);
+        }
+
+        .nav-btn.active {
+            background: var(--ipn-guinda);
+            color: var(--ipn-white);
+            border-bottom-color: var(--ipn-guinda-dark);
+        }
+
+        .nav-btn.active::before {
+            transform: scaleX(0);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Page sections */
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--ipn-white);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px var(--shadow);
+            border-left: 4px solid var(--ipn-guinda);
+        }
+
+        .card-title {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--ipn-guinda);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .card-content {
+            line-height: 1.8;
+            color: var(--text-dark);
+        }
+
+        .card-content strong {
+            color: var(--ipn-guinda);
+            font-weight: 600;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--ipn-white);
+        }
+
+        thead {
+            background: var(--ipn-guinda);
+            color: var(--ipn-white);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr:hover {
+            background: var(--ipn-cream);
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(109, 31, 65, 0.05) 0%, rgba(109, 31, 65, 0.02) 100%);
+            border-left: 4px solid var(--ipn-guinda);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        /* Material cards */
+        .material-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .material-card {
+            background: var(--ipn-white);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .material-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px var(--shadow);
+            border-color: var(--ipn-guinda);
+        }
+
+        .material-name {
+            font-weight: 700;
+            color: var(--ipn-guinda);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .material-speed {
+            color: var(--ipn-guinda-dark);
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .material-desc {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .material-iso {
+            display: inline-block;
+            background: var(--ipn-guinda);
+            color: var(--ipn-white);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .material-tool {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.8rem;
+            font-style: italic;
+        }
+
+        /* Search box for materials */
+        .search-box {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1.1rem;
+            font-family: 'Roboto', sans-serif;
+            background: var(--ipn-white);
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--ipn-guinda);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        /* Simulation Page */
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 0 0 3rem 0;
+        }
+
+        .mode-btn {
+            background: var(--ipn-white);
+            border: 2px solid var(--ipn-guinda);
+            color: var(--ipn-guinda);
+            padding: 1rem 2.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            font-family: 'Roboto Condensed', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .mode-btn:hover {
+            background: var(--ipn-cream);
+        }
+
+        .mode-btn.active {
+            background: var(--ipn-guinda);
+            color: var(--ipn-white);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .simulator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 1024px) {
+            .simulator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .sim-card {
+            background: var(--ipn-white);
+            border: 3px solid var(--ipn-guinda);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px var(--shadow);
+            position: relative;
+            overflow: visible;
+        }
+
+        .sim-card::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(135deg, var(--ipn-guinda) 0%, var(--ipn-guinda-light) 100%);
+            border-radius: 8px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sim-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .sim-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .sim-title {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ipn-guinda);
+        }
+
+        .sim-badge {
+            background: var(--ipn-guinda);
+            color: var(--ipn-white);
+            padding: 0.4rem 1rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            animation: pulse-badge 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-badge {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+/* Lathe Canvas - Vista Lateral Mejorada */
+.lathe-canvas {
+    width: 100%;
+    height: 450px;
+    background: 
+        radial-gradient(ellipse at 30% 40%, rgba(109, 31, 65, 0.03) 0%, transparent 50%),
+        linear-gradient(180deg, #e8e4d9 0%, #d4cfc4 100%);
+    border: 3px solid var(--ipn-guinda);
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Machine base */
+.machine-base {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: linear-gradient(180deg, #555 0%, #333 50%, #222 100%);
+    border-top: 4px solid #888;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.4);
+}
+
+.machine-base::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent 0%, #aaa 20%, #aaa 80%, transparent 100%);
+}
+
+/* Headstock - Lado izquierdo */
+.headstock {
+    position: absolute;
+    left: 8%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100px;
+    height: 160px;
+    background: linear-gradient(135deg, #666 0%, #444 50%, #333 100%);
+    border-radius: 10px;
+    border: 3px solid #777;
+    box-shadow: 
+        inset 0 2px 10px rgba(0,0,0,0.4),
+        0 8px 20px rgba(0,0,0,0.3);
+}
+
+.headstock::after {
+    content: 'HEADSTOCK';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.5rem;
+    color: #999;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* Chuck - Mejorado */
+.chuck {
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 70px;
+    height: 70px;
+    background: radial-gradient(circle, #888 0%, #555 50%, #333 100%);
+    border-radius: 50%;
+    border: 4px solid #666;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.chuck::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 25px;
+    height: 25px;
+    background: #444;
+    border-radius: 50%;
+    border: 2px solid #555;
+}
+
+.chuck-jaw {
+    position: absolute;
+    width: 85%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent 0%, #222 20%, #222 80%, transparent 100%);
+    top: 50%;
+    left: 7.5%;
+    transform: translateY(-50%);
+}
+
+.chuck-jaw:nth-child(2) {
+    transform: translateY(-50%) rotate(90deg);
+}
+
+/* Workpiece - Vista Lateral Realista */
+.workpiece {
+    position: absolute;
+    left: 20%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 280px;
+    height: 65px;
+    z-index: 10;
+}
+
+.workpiece-outer {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+/* Cilindro con efecto de rotación mediante líneas */
+.cylinder {
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(180deg,
+            #9eaeb0 0%,
+            #b8c8ca 15%,
+            #d8e8ea 30%,
+            #f0fafa 50%,
+            #d8e8ea 70%,
+            #b8c8ca 85%,
+            #8e9ea0 100%
+        );
+    border-radius: 4px;
+    position: relative;
+    box-shadow: 
+        inset 0 -15px 20px rgba(0,0,0,0.2),
+        inset 0 15px 20px rgba(255,255,255,0.3),
+        0 5px 20px rgba(0,0,0,0.3);
+}
+
+/* Líneas de velocidad para simular rotación */
+.cylinder::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        rgba(0,0,0,0.08) 1px,
+        transparent 2px,
+        transparent 8px
+    );
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.workpiece.spinning .cylinder::before {
+    opacity: 1;
+    animation: speedLines 0.8s linear infinite;
+}
+
+@keyframes speedLines {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(8px); }
+}
+
+/* Brillo superior del cilindro */
+.cylinder::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 35%;
+    background: linear-gradient(180deg, 
+        rgba(255,255,255,0.5) 0%, 
+        rgba(255,255,255,0.2) 40%,
+        transparent 100%
+    );
+    border-radius: 4px 4px 0 0;
+}
+
+/* Marcas de mecanizado */
+.machining-marks {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        rgba(0,0,0,0.03) 1px,
+        transparent 2px,
+        transparent 12px
+    );
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.workpiece.cutting .machining-marks {
+    opacity: 1;
+}
+
+/* Tool post - Posicionado arriba */
+.tool-post {
+    position: absolute;
+    left: 48%;
+    top: 25%;
+    width: 70px;
+    height: 90px;
+    background: linear-gradient(135deg, #666 0%, #444 50%, #333 100%);
+    border: 3px solid #777;
+    border-radius: 6px;
+    transition: left 0.5s ease, top 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    z-index: 15;
+}
+
+.tool-post.cutting {
+    box-shadow: 0 6px 20px rgba(109, 31, 65, 0.5);
+    top: 28%;
+}
+
+.tool-holder {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 45px;
+    height: 55px;
+    background: linear-gradient(135deg, #7a8a8b 0%, #5a6a6b 100%);
+    border: 2px solid #666;
+    border-radius: 4px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* Herramienta de corte apuntando hacia abajo */
+.cutting-tool {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 24px solid var(--ipn-guinda);
+    filter: drop-shadow(0 0 10px rgba(109, 31, 65, 0.7));
+    transition: filter 0.3s ease;
+}
+
+.cutting-tool.active {
+    filter: drop-shadow(0 0 15px rgba(109, 31, 65, 1)) drop-shadow(0 0 25px rgba(255, 107, 53, 0.5));
+}
+
+/* Tailstock */
+.tailstock {
+    position: absolute;
+    right: 12%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 80px;
+    height: 130px;
+    background: linear-gradient(135deg, #666 0%, #444 50%, #333 100%);
+    border-radius: 8px;
+    border: 3px solid #777;
+    box-shadow: 
+        inset 0 2px 10px rgba(0,0,0,0.3),
+        0 6px 20px rgba(0,0,0,0.3);
+}
+
+.tailstock::after {
+    content: 'TAILSTOCK';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.45rem;
+    color: #999;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* CNC Elements */
+.cnc-screen {
+    position: absolute;
+    right: 8%;
+    top: 15%;
+    width: 120px;
+    height: 100px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border: 4px solid #444;
+    border-radius: 6px;
+    box-shadow: 
+        0 4px 15px rgba(0,0,0,0.4),
+        inset 0 0 20px rgba(0,255,0,0.1);
+    z-index: 20;
+}
+
+.cnc-screen::before {
+    content: 'FANUC CNC';
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.55rem;
+    color: #4CAF50;
+    font-weight: 700;
+    font-family: monospace;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+.screen-display {
+    position: absolute;
+    top: 22px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    background: #0a3d0a;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.55rem;
+    color: #4CAF50;
+    padding: 4px;
+    line-height: 1.3;
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    animation: screenFlicker 3s infinite;
+}
+
+@keyframes screenFlicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.98; }
+}
+
+.cnc-turret {
+    position: absolute;
+    left: 48%;
+    top: 18%;
+    width: 90px;
+    height: 25px;
+    background: linear-gradient(135deg, #555 0%, #333 100%);
+    border: 3px solid #666;
+    border-radius: 6px;
+    transform: translateX(-50%);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    z-index: 12;
+}
+
+.cnc-turret::before {
+    content: 'TURRET';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.5rem;
+    color: #999;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.cnc-turret::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    background: #e74c3c;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #e74c3c;
+    animation: turretLight 1.5s ease-in-out infinite;
+}
+
+@keyframes turretLight {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.cnc-control-panel {
+    position: absolute;
+    right: 5%;
+    bottom: 80px;
+    width: 70px;
+    height: 80px;
+    background: linear-gradient(135deg, #555 0%, #3a3a3a 100%);
+    border: 3px solid #666;
+    border-radius: 6px;
+    padding: 6px;
+    box-shadow: 
+        0 4px 15px rgba(0,0,0,0.4),
+        inset 0 2px 8px rgba(0,0,0,0.3);
+    z-index: 20;
+}
+
+.cnc-button {
+    width: 10px;
+    height: 10px;
+    background: #444;
+    border-radius: 50%;
+    margin: 4px;
+    display: inline-block;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+}
+
+.cnc-button.active {
+    background: #4CAF50;
+    box-shadow: 0 0 10px #4CAF50, inset 0 1px 2px rgba(255,255,255,0.3);
+    animation: buttonPulse 2s ease-in-out infinite;
+}
+
+@keyframes buttonPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.cnc-status-display {
+    position: absolute;
+    right: 5%;
+    top: 38%;
+    background: #1a1a1a;
+    border: 2px solid #444;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.6rem;
+    color: #4CAF50;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+    z-index: 20;
+}
+
+/* Conventional Lathe Elements */
+.hand-wheel {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #666 0%, #444 40%, #333 100%);
+    border: 4px solid #555;
+    box-shadow: 
+        0 4px 12px rgba(0,0,0,0.4),
+        inset 0 2px 8px rgba(0,0,0,0.3);
+    z-index: 20;
+}
+
+.hand-wheel::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 15px;
+    height: 15px;
+    background: #222;
+    border-radius: 50%;
+    border: 2px solid #444;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.hand-wheel::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 75%;
+    height: 3px;
+    background: linear-gradient(90deg, #555 0%, #666 50%, #555 100%);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.hand-wheel.spinning {
+    animation: wheelRotate 3s linear infinite;
+}
+
+@keyframes wheelRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.wheel-longitudinal {
+    bottom: 90px;
+    right: 25%;
+}
+
+.wheel-transversal {
+    bottom: 140px;
+    right: 20%;
+}
+
+.conv-lever {
+    position: absolute;
+    right: 15%;
+    top: 35%;
+    width: 10px;
+    height: 70px;
+    background: linear-gradient(180deg, #666 0%, #444 100%);
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    z-index: 20;
+}
+
+.conv-lever::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, #888 0%, #555 100%);
+    border-radius: 50%;
+    border: 3px solid #666;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.conv-dial {
+    position: absolute;
+    right: 8%;
+    top: 20%;
+    width: 55px;
+    height: 55px;
+    background: radial-gradient(circle, #555 0%, #333 100%);
+    border-radius: 50%;
+    border: 4px solid #666;
+    box-shadow: 
+        0 4px 12px rgba(0,0,0,0.3),
+        inset 0 2px 8px rgba(0,0,0,0.4);
+    z-index: 20;
+}
+
+.conv-dial::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%;
+    height: 85%;
+    background: repeating-conic-gradient(
+        from 0deg,
+        #444 0deg 9deg,
+        #555 9deg 10deg
+    );
+    border-radius: 50%;
+}
+
+.conv-dial::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 35%;
+    height: 35%;
+    background: #222;
+    border-radius: 50%;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.conv-dial-pointer {
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 20%;
+    background: #e74c3c;
+    border-radius: 2px;
+    box-shadow: 0 0 4px #e74c3c;
+}
+
+.gear-lever {
+    position: absolute;
+    left: 12%;
+    bottom: 95px;
+    width: 35px;
+    height: 60px;
+    background: linear-gradient(180deg, #555 0%, #333 100%);
+    border: 3px solid #444;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 20;
+}
+
+.gear-lever::before {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 55px;
+    height: 18px;
+    background: #2a2a2a;
+    border: 2px solid #444;
+    border-radius: 3px;
+}
+
+.gear-lever::after {
+    content: 'GEARS';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.45rem;
+    color: #999;
+    font-weight: 700;
+}
+
+.oil-reservoir {
+    position: absolute;
+    right: 20%;
+    bottom: 85px;
+    width: 40px;
+    height: 50px;
+    background: linear-gradient(135deg, #444 0%, #222 100%);
+    border: 2px solid #555;
+    border-radius: 4px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    z-index: 5;
+}
+
+.oil-reservoir::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 25px;
+    height: 30px;
+    background: rgba(255, 200, 100, 0.4);
+    border-radius: 3px;
+    animation: oilLevel 3s ease-in-out infinite;
+}
+
+@keyframes oilLevel {
+    0%, 100% { height: 30px; }
+    50% { height: 25px; }
+}
+
+.carriage-rail {
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    bottom: 75px;
+    height: 10px;
+    background: linear-gradient(90deg, #555 0%, #666 50%, #555 100%);
+    border-top: 2px solid #444;
+    border-bottom: 2px solid #777;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    z-index: 5;
+}
+
+/* Coolant - Mejorado para caer sobre la herramienta */
+.coolant {
+    position: absolute;
+    top: 20%;
+    left: 48%;
+    width: 80px;
+    height: 120px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 8;
+}
+
+.coolant.active {
+    opacity: 0.6;
+}
+
+.coolant-stream {
+    position: absolute;
+    width: 2px;
+    height: 50px;
+    background: linear-gradient(180deg, rgba(100, 200, 255, 0.8) 0%, transparent 100%);
+    animation: coolantFlow 0.8s linear infinite;
+}
+
+.coolant-stream:nth-child(1) { left: 25px; animation-delay: 0s; }
+.coolant-stream:nth-child(2) { left: 35px; animation-delay: 0.2s; }
+.coolant-stream:nth-child(3) { left: 45px; animation-delay: 0.4s; }
+
+@keyframes coolantFlow {
+    0% {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(80px);
+        opacity: 0;
+    }
+}
+
+/* Chips - Caen más naturalmente */
+.chips {
+    position: absolute;
+    top: 40%;
+    left: 48%;
+    width: 120px;
+    height: 80px;
+    pointer-events: none;
+    z-index: 11;
+}
+
+.chip {
+    position: absolute;
+    width: 12px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--ipn-guinda-dark) 0%, var(--ipn-guinda) 50%, var(--ipn-guinda-light) 100%);
+    border-radius: 2px;
+    opacity: 0;
+    animation: chipFall 1.5s ease-in infinite;
+    box-shadow: 0 2px 4px rgba(109, 31, 65, 0.4);
+}
+
+.chip:nth-child(1) { animation-delay: 0s; left: 20px; }
+.chip:nth-child(2) { animation-delay: 0.3s; left: 30px; }
+.chip:nth-child(3) { animation-delay: 0.6s; left: 40px; }
+.chip:nth-child(4) { animation-delay: 0.9s; left: 50px; }
+.chip:nth-child(5) { animation-delay: 1.2s; left: 60px; }
+
+@keyframes chipFall {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-40px, 120px) rotate(-180deg);
+        opacity: 0;
+    }
+}
+
+/* Sparks - Para materiales duros */
+.sparks {
+    position: absolute;
+    top: 43%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 11;
+}
+
+.sparks.active {
+    opacity: 1;
+}
+
+.spark {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #ffeb3b;
+    border-radius: 50%;
+    box-shadow: 0 0 4px #ffeb3b;
+    opacity: 0;
+    animation: sparkFly 0.6s ease-out infinite;
+}
+
+.spark:nth-child(1) { animation-delay: 0s; }
+.spark:nth-child(2) { animation-delay: 0.1s; }
+.spark:nth-child(3) { animation-delay: 0.2s; }
+.spark:nth-child(4) { animation-delay: 0.3s; }
+.spark:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes sparkFly {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(-30px + var(--spark-x, 0)), calc(40px + var(--spark-y, 0))) scale(0);
+        opacity: 0;
+    }
+}
+
+.spark:nth-child(1) { --spark-x: -10px; --spark-y: 5px; }
+.spark:nth-child(2) { --spark-x: 0px; --spark-y: 10px; }
+.spark:nth-child(3) { --spark-x: 10px; --spark-y: 8px; }
+.spark:nth-child(4) { --spark-x: -5px; --spark-y: 12px; }
+.spark:nth-child(5) { --spark-x: 5px; --spark-y: 6px; }
+
+        /* Stats panel - BURBUJAS CIRCULARES */
+        .stats-panel {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(109, 31, 65, 0.05) 0%, rgba(109, 31, 65, 0.02) 100%);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-bubble {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--ipn-white) 0%, var(--ipn-cream) 100%);
+            border: 3px solid var(--ipn-guinda);
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .stat-bubble:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        .stat-bubble.optimal {
+            border-color: #27ae60;
+        }
+
+        .stat-bubble.warning {
+            border-color: #f39c12;
+        }
+
+        .stat-bubble.danger {
+            border-color: #e74c3c;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ipn-guinda);
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+
+        .stat-value.warning {
+            color: #f39c12;
+        }
+
+        .stat-value.danger {
+            color: #e74c3c;
+        }
+
+        .stat-value.optimal {
+            color: #27ae60;
+        }
+
+        .stat-unit {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin-top: 0.2rem;
+        }
+
+        /* Alert boxes */
+        .alert-box {
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .alert-box.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-optimal {
+            background: rgba(39, 174, 96, 0.1);
+            border-left-color: #27ae60;
+            color: #27ae60;
+        }
+
+        .alert-warning {
+            background: rgba(243, 156, 18, 0.1);
+            border-left-color: #f39c12;
+            color: #e67e22;
+        }
+
+        .alert-danger {
+            background: rgba(231, 76, 60, 0.1);
+            border-left-color: #e74c3c;
+            color: #c0392b;
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 2rem;
+        }
+
+        .control-group {
+            margin-bottom: 1.8rem;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .label-text {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .label-value {
+            font-family: 'Roboto Condensed', sans-serif;
+            color: var(--ipn-guinda);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            outline: none;
+            border-radius: 3px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--ipn-guinda);
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid var(--ipn-white);
+            box-shadow: 0 2px 8px var(--shadow);
+            transition: all 0.2s;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--ipn-guinda);
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid var(--ipn-white);
+            box-shadow: 0 2px 8px var(--shadow);
+            transition: all 0.2s;
+        }
+
+        .material-selector {
+            margin-bottom: 2rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--ipn-white);
+            color: var(--text-dark);
+            font-size: 1rem;
+            font-family: 'Roboto', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--ipn-guinda);
+        }
+
+        .status-info {
+            background: linear-gradient(135deg, rgba(109, 31, 65, 0.05) 0%, rgba(109, 31, 65, 0.02) 100%);
+            border-left: 4px solid var(--ipn-guinda);
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        /* References page */
+        .references-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .references-list li {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .references-list li:last-child {
+            border-bottom: none;
+        }
+
+        .ref-number {
+            display: inline-block;
+            background: var(--ipn-guinda);
+            color: var(--ipn-white);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: 600;
+            margin-right: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .developer-card {
+            background: linear-gradient(135deg, var(--ipn-guinda) 0%, var(--ipn-guinda-dark) 100%);
+            color: var(--ipn-white);
+            border-radius: 8px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .developer-name {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Roboto Condensed', sans-serif;
+            margin-bottom: 0.5rem;
+        }
+
+        .developer-title {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .developer-info {
+            font-size: 0.95rem;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        footer {
+            background: var(--ipn-guinda);
+            color: var(--ipn-white);
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-panel {
+                flex-wrap: wrap;
+            }
+            
+            .stat-bubble {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.3rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .nav-btn {
+                padding: 1rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .nav-content {
+                flex-wrap: wrap;
+            }
+
+            .material-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mode-selector {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .mode-btn {
+                width: 100%;
+            }
+
+            .sim-card {
+                padding: 1.5rem;
+            }
+
+            .lathe-canvas {
+                height: 350px;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.7rem 0.5rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .card-title {
+                font-size: 1.5rem;
+            }
+
+            .stats-panel {
+                flex-direction: column;
+            }
+
+            .stat-bubble {
+                width: 140px;
+                height: 140px;
+            }
+
+            .stat-label {
+                font-size: 0.7rem;
+            }
+
+            .stat-value {
+                font-size: 1.3rem;
+            }
+
+            .control-group {
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+
+            h1 {
+                font-size: 1.1rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .ipn-logo {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+
+            .nav-btn {
+                padding: 0.9rem 1.2rem;
+                font-size: 0.85rem;
+            }
+
+            .card-title {
+                font-size: 1.3rem;
+            }
+
+            .lathe-canvas {
+                height: 300px;
+            }
+
+            .material-name {
+                font-size: 1rem;
+            }
+
+            .material-speed {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="ipn-logo">IPN</div>
+                <div>
+                    <h1>SIMULADOR DE TORNEADO</h1>
+                    <p style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.3rem;">Parámetros de Corte en Maquinado</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="nav-content">
+            <button class="nav-btn active" onclick="showPage('index')">INFORMACIÓN</button>
+            <button class="nav-btn" onclick="showPage('velocities')">VELOCIDADES DE CORTE</button>
+            <button class="nav-btn" onclick="showPage('simulation')">SIMULACIÓN</button>
+            <button class="nav-btn" onclick="showPage('references')">REFERENCIAS</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- INDEX PAGE -->
+        <div id="index" class="page active">
+            <div class="card">
+                <h2 class="card-title">Velocidad de Avance en Torneado</h2>
+                <div class="card-content">
+                    <p>La <strong>velocidad de avance (f)</strong> se mide en <strong>mm/rev</strong> (milímetros por revolución) y determina qué tan rápido se desplaza la herramienta de corte a lo largo de la pieza por cada rotación del husillo.</p>
+                    
+                    <div class="highlight-box">
+                        <p><strong>Punto Clave:</strong> El avance afecta directamente la calidad superficial y el tiempo de mecanizado. Mayor avance = más rápido, pero peor acabado.</p>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Operación</th>
+                                <th>Rango de Avance</th>
+                                <th>Objetivo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Desbaste</strong></td>
+                                <td>0.25 – 0.60 mm/rev</td>
+                                <td>Remover material rápidamente</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Acabado</strong></td>
+                                <td>0.05 – 0.20 mm/rev</td>
+                                <td>Lograr buen acabado superficial y precisión</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p><strong>Factores que influyen en el avance:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                        <li><strong>Rigidez:</strong> Mayor rigidez del sistema máquina-herramienta-pieza permite aumentar el avance</li>
+                        <li><strong>Material:</strong> Materiales dúctiles (aluminio, latón) admiten avances mayores que materiales duros</li>
+                        <li><strong>Herramienta:</strong> Plaquitas "wiper" o con radio de punta grande permiten duplicar o triplicar el avance</li>
+                        <li><strong>Acabado requerido:</strong> Acabados finos requieren avances muy bajos</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Profundidad de Corte</h2>
+                <div class="card-content">
+                    <p>La <strong>profundidad de corte (ap)</strong> es el espesor radial de material que se remueve en cada pasada. Se mide como la diferencia entre el radio inicial y final de la pieza.</p>
+                    
+                    <div class="highlight-box">
+                        <p><strong>Fórmula:</strong> ap = (Diámetro inicial - Diámetro final) / 2</p>
+                        <p style="margin-top: 0.5rem;"><strong>Ejemplo:</strong> Si torneamos de Ø50mm a Ø46mm → ap = (50-46)/2 = 2mm</p>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Operación</th>
+                                <th>Profundidad de Corte</th>
+                                <th>Características</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Desbaste</strong></td>
+                                <td>2 – 8 mm (o más)</td>
+                                <td>Remoción rápida de material, varias pasadas</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Acabado</strong></td>
+                                <td>0.1 – 0.5 mm</td>
+                                <td>Pasada final para tolerancias y acabado superficial</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p><strong>Consideraciones importantes:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                        <li><strong>Material duro:</strong> (Acero templado, Inconel, Titanio) requieren pasadas más superficiales</li>
+                        <li><strong>Fuerza de corte:</strong> Aumenta proporcionalmente con la profundidad de corte</li>
+                        <li><strong>Rigidez:</strong> Máquinas más rígidas permiten profundidades mayores sin vibraciones</li>
+                        <li><strong>Capacidad de herramienta:</strong> Plaquitas reforzadas soportan mayores profundidades</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">El Proceso de Torneado</h2>
+                <div class="card-content">
+                    <p>
+                        El <strong>torneado</strong> es un proceso de mecanizado por arranque de viruta donde la pieza de trabajo gira 
+                        mientras una herramienta de corte se desplaza linealmente para remover material y dar forma a la pieza.
+                    </p>
+
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <img src="Torneado.jpg" alt="Proceso de torneado" style="
+                            width: 100%;
+                            max-width: 650px;
+                            height: auto;
+                            border-radius: 10px;
+                            box-shadow: 0px 6px 15px rgba(0,0,0,0.2);
+                            display: block;
+                            margin: 0 auto;
+                        ">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Materiales de Herramientas de Corte</h2>
+                <div class="card-content">
+                    <p>La selección del material de la herramienta es crítica para el éxito del mecanizado. Cada material tiene propiedades específicas que lo hacen adecuado para diferentes aplicaciones.</p>
+
+                    <table style="margin-top: 1.5rem;">
+                        <thead>
+                            <tr>
+                                <th>Material</th>
+                                <th>Dureza (HV)</th>
+                                <th>Temp. Máx. (°C)</th>
+                                <th>Aplicaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>HSS (Acero Rápido)</strong></td>
+                                <td>800-900</td>
+                                <td>600</td>
+                                <td>Velocidades bajas, piezas complejas, buena tenacidad</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Carburo sin recubrimiento</strong></td>
+                                <td>1500-1800</td>
+                                <td>800-900</td>
+                                <td>Uso general, buena relación costo-rendimiento</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Carburo recubierto TiN</strong></td>
+                                <td>2000-2400</td>
+                                <td>600</td>
+                                <td>Aceros, mejor vida útil que sin recubrimiento</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Carburo recubierto TiAlN</strong></td>
+                                <td>3000</td>
+                                <td>800-900</td>
+                                <td>Aceros inoxidables, altas temperaturas</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cerámica (Al₂O₃)</strong></td>
+                                <td>2000-2500</td>
+                                <td>1200</td>
+                                <td>Fundiciones, aceros templados, altas velocidades</td>
+                            </tr>
+                            <tr>
+                                <td><strong>CBN (Nitruro de Boro Cúbico)</strong></td>
+                                <td>4500</td>
+                                <td>1400</td>
+                                <td>Aceros endurecidos (>45 HRC), fundiciones duras</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PCD (Diamante Policristalino)</strong></td>
+                                <td>8000-10000</td>
+                                <td>700</td>
+                                <td>Aluminio, metales no ferrosos, plásticos reforzados</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="highlight-box" style="margin-top: 2rem;">
+                        <p><strong>Regla general de selección:</strong></p>
+                        <p style="margin-top: 0.5rem;">• Mayor dureza del material → Herramienta más dura requerida</p>
+                        <p>• Mayor velocidad de corte → Herramienta con mayor resistencia térmica</p>
+                        <p>• Operaciones interrumpidas → Herramienta más tenaz (carburo o HSS)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Sistemas de Refrigeración y Lubricación</h2>
+                <div class="card-content">
+                    <p>El <strong>fluido de corte</strong> es esencial para disipar el calor generado durante el mecanizado, lubricar la interfaz herramienta-viruta, y evacuar las virutas de la zona de corte.</p>
+
+                    <p style="margin-top: 1.5rem;"><strong>Tipos de fluidos de corte:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                        <li><strong>Aceites de corte puros:</strong> Excelente lubricación, pobre refrigeración. Usado en roscado y brocas</li>
+                        <li><strong>Emulsiones (soluble oils):</strong> Balance entre lubricación y refrigeración. Más común en torneado general</li>
+                        <li><strong>Fluidos sintéticos:</strong> Mejor refrigeración, menor lubricación. Para altas velocidades</li>
+                        <li><strong>Fluidos semisintéticos:</strong> Híbrido, buenas propiedades generales</li>
+                        <li><strong>MQL (Mínima Cantidad de Lubricante):</strong> Micro-pulverización, ecológico</li>
+                    </ul>
+
+                    <p style="margin-top: 1.5rem;"><strong>Métodos de aplicación:</strong></p>
+                    <table style="margin-top: 1rem;">
+                        <thead>
+                            <tr>
+                                <th>Método</th>
+                                <th>Presión</th>
+                                <th>Aplicación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Inundación convencional</strong></td>
+                                <td>2-10 bar</td>
+                                <td>Torneado general, desbaste</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Alta presión (HPC)</strong></td>
+                                <td>70-100 bar</td>
+                                <td>Materiales difíciles (titanio, inconel)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>A través de herramienta</strong></td>
+                                <td>10-30 bar</td>
+                                <td>Taladrado profundo, mejor evacuación</td>
+                            </tr>
+                            <tr>
+                                <td><strong>MQL</strong></td>
+                                <td>5-8 bar (aire)</td>
+                                <td>Mecanizado ecológico, aluminio</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Corte en seco</strong></td>
+                                <td>-</td>
+                                <td>Fundición gris, herramientas cerámicas/CBN</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="highlight-box" style="margin-top: 2rem;">
+                        <p><strong>Cuando NO usar refrigeración:</strong></p>
+                        <p style="margin-top: 0.5rem;">• Fundición gris (produce choque térmico en la herramienta)</p>
+                        <p>• Herramientas cerámicas o CBN (sensibles al choque térmico)</p>
+                        <p>• Magnesio (riesgo de reacción química violenta con agua)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Acabado Superficial y Tolerancias</h2>
+                <div class="card-content">
+                    <p>El <strong>acabado superficial</strong> (Ra) es una medida de la rugosidad de la superficie mecanizada. Se mide en micrómetros (μm) y depende principalmente del avance y el radio de punta de la herramienta.</p>
+
+                    <div class="highlight-box">
+                        <p><strong>Fórmula teórica de rugosidad:</strong></p>
+                        <p style="margin-top: 0.5rem;">Ra ≈ (f²) / (32 × r)</p>
+                        <p style="margin-top: 0.3rem;">Donde: f = avance (mm/rev), r = radio de punta (mm)</p>
+                    </div>
+
+                    <table style="margin-top: 1.5rem;">
+                        <thead>
+                            <tr>
+                                <th>Operación</th>
+                                <th>Ra típico (μm)</th>
+                                <th>Tolerancia IT</th>
+                                <th>Aplicación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Desbaste</strong></td>
+                                <td>12.5 - 25</td>
+                                <td>IT12 - IT13</td>
+                                <td>Remoción rápida de material</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Semi-acabado</strong></td>
+                                <td>3.2 - 6.3</td>
+                                <td>IT9 - IT11</td>
+                                <td>Preparación para acabado</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Acabado</strong></td>
+                                <td>0.8 - 1.6</td>
+                                <td>IT6 - IT8</td>
+                                <td>Superficies funcionales</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Acabado fino</strong></td>
+                                <td>0.2 - 0.4</td>
+                                <td>IT5 - IT6</td>
+                                <td>Ajustes precisos, rodamientos</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Super-acabado</strong></td>
+                                <td>0.05 - 0.1</td>
+                                <td>IT4</td>
+                                <td>Superficies ópticas, sellos</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p style="margin-top: 1.5rem;"><strong>Factores que afectan el acabado:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                        <li><strong>Radio de punta mayor:</strong> Mejor acabado (plaquitas wiper tienen radio muy grande)</li>
+                        <li><strong>Avance menor:</strong> Mejor acabado (relación cuadrática)</li>
+                        <li><strong>Vibraciones:</strong> Degradan el acabado (rigidez es crítica)</li>
+                        <li><strong>Desgaste de herramienta:</strong> Aumenta la rugosidad progresivamente</li>
+                        <li><strong>Material de la pieza:</strong> Materiales dúctiles tienden a generar BUE (Built-Up Edge)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Características del Torno CNC</h2>
+                <div class="card-content">
+                    <p><strong>Control Numérico Computarizado:</strong> Sistema digital que ejecuta programas G-code para automatizar completamente el proceso de mecanizado.</p>
+                    
+                    <p style="margin-top: 1.5rem;"><strong>Componentes principales:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                        <li><strong>Panel de Control CNC:</strong> Pantalla táctil o con teclado para programación y monitoreo. Muestra posiciones en tiempo real, códigos G/M, y gráficos de trayectoria</li>
+                        <li><strong>Torreta Automática:</strong> Portaherramientas motorizado con 6-12 posiciones. Cambio de herramienta en 0.5-2 segundos</li>
+                        <li><strong>Servomotores:</strong> Motores de alta precisión con encoders para control exacto de posición (resolución típica: 0.001mm)</li>
+                        <li><strong>Sistema de Refrigeración:</strong> Bombas de alta presión (hasta 70 bar) con boquillas programables</li>
+                        <li><strong>Husillo Motorizado:</strong> Control de velocidad variable por frecuencia (VFD), típicamente 0-4000 RPM</li>
+                        <li><strong>Guías Lineales:</strong> Rodamientos de bolas o rodillos para movimiento suave y preciso</li>
+                    </ul>
+
+                    <p style="margin-top: 1.5rem;"><strong>Modos de operación:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                        <li><strong>G96 (CSS):</strong> Constant Surface Speed - Mantiene Vc constante ajustando RPM automáticamente</li>
+                        <li><strong>G97:</strong> RPM fijas - Similar a torno convencional, usado en roscado</li>
+                        <li><strong>G94/G95:</strong> Avance en mm/min o mm/rev</li>
+                        <li><strong>Ciclos fijos:</strong> G70-G76 para roscado, ranurado, desbaste automático</li>
+                    </ul>
+
+                    <p style="margin-top: 1.5rem;"><strong>Ventajas técnicas:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                        <li>Interpolación circular y elíptica para perfiles complejos</li>
+                        <li>Compensación automática de desgaste de herramienta</li>
+                        <li>Monitoreo de carga del husillo para prevenir roturas</li>
+                        <li>Subprogramas y macros para operaciones repetitivas</li>
+                        <li>Simulación gráfica antes de mecanizar</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Características del Torno Convencional</h2>
+                <div class="card-content">
+                    <p><strong>Operación Manual:</strong> Control directo por el operador mediante volantes, palancas y cajas de cambios mecánicas. Requiere habilidad y experiencia del maquinista.</p>
+                    
+                    <p style="margin-top: 1.5rem;"><strong>Componentes principales:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                        <li><strong>Volante Longitudinal:</strong> Control manual del movimiento del carro en eje Z. Graduado típicamente en 0.05mm por división</li>
+                        <li><strong>Volante Transversal:</strong> Control del movimiento radial (eje X). Permite ajuste fino de profundidad de corte</li>
+                        <li><strong>Caja Norton:</strong> Sistema de engranajes para seleccionar avances automáticos (típico: 0.05-0.60 mm/rev)</li>
+                        <li><strong>Palanca de Velocidades:</strong> Caja de cambios mecánica con 6-12 velocidades escalonadas</li>
+                        <li><strong>Contrapunto:</strong> Soporte para piezas largas y para montaje de brocas/mandriles</li>
+                        <li><strong>Portaherramientas:</strong> Torre de 4 posiciones típicamente, cambio manual</li>
+                        <li><strong>Dial Graduado:</strong> Escalas en el carro para medición precisa (0.02-0.05mm de resolución)</li>
+                    </ul>
+
+                    <p style="margin-top: 1.5rem;"><strong>Controles de operación:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                        <li><strong>Selector de RPM:</strong> Palancas para cambiar relación de poleas/engranajes. Velocidades típicas: 100, 200, 400, 600, 900, 1200 RPM</li>
+                        <li><strong>Avance automático:</strong> Palanca de conexión/desconexión del avance motorizado</li>
+                        <li><strong>Roscar:</strong> Selector de paso de rosca mediante engranajes intercambiables</li>
+                        <li><strong>Sentido de giro:</strong> Inversor manual o eléctrico para trabajos especiales</li>
+                    </ul>
+
+                    <p style="margin-top: 1.5rem;"><strong>Habilidades requeridas:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                        <li>Lectura e interpretación de planos técnicos</li>
+                        <li>Cálculo manual de RPM y avances</li>
+                        <li>Medición precisa con micrómetros y calibradores</li>
+                        <li>Afilado y selección de herramientas</li>
+                        <li>Ajuste de paralelismo y concentricidad</li>
+                        <li>Control de acabado superficial por tacto y observación</li>
+                    </ul>
+
+                    <p style="margin-top: 1.5rem;"><strong>Limitaciones:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                        <li>RPM fijas - la Vc disminuye al reducir el diámetro</li>
+                        <li>Cambio manual de herramientas (tiempo muerto)</li>
+                        <li>Repetibilidad limitada por factor humano</li>
+                        <li>Perfiles complejos difíciles o imposibles</li>
+                        <li>Productividad menor en series grandes</li>
+                    </ul>
+
+                    <p style="margin-top: 1.5rem;"><strong>Aplicaciones ideales:</strong></p>
+                    <ul style="margin-left: 2rem; margin-top: 1rem; line-height: 2;">
+                        <li>Talleres de mantenimiento y reparación</li>
+                        <li>Prototipos y piezas únicas</li>
+                        <li>Producción de lotes muy pequeños (1-5 piezas)</li>
+                        <li>Trabajos donde la habilidad artesanal es valorada</li>
+                        <li>Enseñanza de fundamentos de mecanizado</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">CNC vs Convencional: Diferencias Clave</h2>
+                <div class="card-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Aspecto</th>
+                                <th>Torno CNC</th>
+                                <th>Torno Convencional</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Control de velocidad</strong></td>
+                                <td>G96 - Velocidad de corte constante automática</td>
+                                <td>RPM fijas, Vc varía con el diámetro</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Programación de avance</strong></td>
+                                <td>mm/rev o mm/min con alta precisión digital</td>
+                                <td>Selección mecánica (palanca de avances)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sistema de control</strong></td>
+                                <td>CNC (Fanuc, Siemens, Haas) con pantalla táctil</td>
+                                <td>Controles manuales (volantes y palancas)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Posicionamiento</strong></td>
+                                <td>Servomotores con encoders - precisión absoluta</td>
+                                <td>Manual con escalas graduadas o visualizadores DRO</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cambio de herramienta</strong></td>
+                                <td>Torreta automática (6-12 herramientas) en segundos</td>
+                                <td>Cambio manual - minutos por herramienta</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Repetibilidad</strong></td>
+                                <td>±0.005mm - Alta precisión</td>
+                                <td>±0.05mm - Depende del operador</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Productividad</strong></td>
+                                <td>Alta - Operación continua 24/7 posible</td>
+                                <td>Media - Requiere atención del operador</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Complejidad de piezas</strong></td>
+                                <td>Perfiles complejos, roscas múltiples, interpolaciones</td>
+                                <td>Geometrías simples - cilindros, conos, roscas básicas</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tiempo de setup</strong></td>
+                                <td>Largo inicial (programación) pero rápido para lotes</td>
+                                <td>Rápido para piezas únicas, lento para lotes grandes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Compensación de herramientas</strong></td>
+                                <td>Automática - almacena offsets de todas las herramientas</td>
+                                <td>Manual - operador ajusta cada herramienta</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Costo de inversión</strong></td>
+                                <td>Alto ($50,000 - $500,000+ USD)</td>
+                                <td>Bajo a medio ($5,000 - $50,000 USD)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Flexibilidad</strong></td>
+                                <td>Cambio instantáneo entre programas diferentes</td>
+                                <td>Setup manual para cada configuración</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Curva de aprendizaje</strong></td>
+                                <td>Media-alta: requiere programación y conocimiento de códigos G</td>
+                                <td>Media: requiere habilidad manual y experiencia</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="highlight-box">
+                        <p><strong>Ventaja clave del CNC:</strong> El modo G96 ajusta automáticamente las RPM para mantener la velocidad de corte óptima conforme el diámetro de la pieza cambia. Esto maximiza la vida útil de la herramienta y la calidad del acabado.</p>
+                        <p style="margin-top: 0.8rem;"><strong>Ejemplo práctico:</strong> Al tornear de Ø100mm a Ø50mm con Vc=180 m/min:</p>
+                        <p style="margin-top: 0.5rem;">• <strong>Torno CNC:</strong> Inicia a 573 RPM (Ø100mm) y automáticamente aumenta a 1,146 RPM (Ø50mm)</p>
+                        <p>• <strong>Torno Convencional:</strong> Si se fija a 573 RPM, la Vc cae de 180 m/min a solo 90 m/min al llegar a Ø50mm, reduciendo eficiencia y calidad</p>
+                    </div>
+
+                    <div class="highlight-box" style="margin-top: 1.5rem;">
+                        <p><strong>Cuándo usar cada tipo:</strong></p>
+                        <p style="margin-top: 0.8rem;"><strong>Torno CNC ideal para:</strong></p>
+                        <ul style="margin-left: 2rem; margin-top: 0.5rem; line-height: 1.8;">
+                            <li>Producción en serie (lotes de 10+ piezas)</li>
+                            <li>Piezas con geometrías complejas</li>
+                            <li>Alta precisión y repetibilidad requerida</li>
+                            <li>Operación desatendida (producción nocturna)</li>
+                        </ul>
+                        <p style="margin-top: 0.8rem;"><strong>Torno Convencional ideal para:</strong></p>
+                        <ul style="margin-left: 2rem; margin-top: 0.5rem; line-height: 1.8;">
+                            <li>Prototipos y piezas únicas</li>
+                            <li>Geometrías simples (ejes, bujes, cilindros)</li>
+                            <li>Talleres con presupuesto limitado</li>
+                            <li>Reparaciones y modificaciones sobre la marcha</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!-- VELOCIDADES DE TORNEADO PAGE - UNIFICADA (AMPLIADA) -->
+        <div id="velocities" class="page">
+            <div class="card">
+                <h2 class="card-title">Velocidades de Corte (Vc) por Material — (Torno Convencional &amp; Torno CNC)</h2>
+                <div class="card-content">
+                    <p>La <strong>velocidad de corte (Vc)</strong> es la velocidad lineal a la que el filo de la herramienta se desplaza sobre la superficie de la pieza. Se mide en <strong>m/min</strong> (metros por minuto) y es uno de los parámetros más críticos en el torneado. Abajo cada tarjeta incluye: <em>Desbaste</em> y <em>Acabado</em> (dos rangos), <strong>Avance recomendado (mm/rev)</strong> y <strong>Profundidad de corte (ap) sugerida</strong> para desbaste y acabado.</p>
+                    
+                    <div class="highlight-box">
+                        <p><strong>Fórmula de RPM:</strong> n = (1000 × Vc) / (π × D)</p>
+                        <p style="margin-top: 0.5rem;">Donde:</p>
+                        <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                            <li>n = Revoluciones por minuto (RPM)</li>
+                            <li>Vc = Velocidad de corte (m/min)</li>
+                            <li>D = Diámetro de la pieza (mm)</li>
+                            <li>π ≈ 3.14159</li>
+                        </ul>
+                    </div>
+
+                    <p style="margin-top: 1.5rem;"><strong>Busca por material, clasificación ISO, velocidad o herramienta:</strong></p>
+                    <input type="text" id="materialSearch" class="search-box"
+                        placeholder="Ej: acero, aluminio, ISO P, titanio, 150-220, CBN...">                    
+                    <div class="material-grid" id="materialGrid">
+
+                        <!-- ========================= -->
+                        <!-- ACEROS AL CARBONO / ISO P -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="acero dulce bajo carbono 1018 1020 ISO P 160-250 130-210 carburo recubierto">
+                            <div class="material-name">Acero Dulce (Bajo Carbono) — AISI 1018 / 1020</div>
+                            <span class="material-iso">ISO P</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 160–220 m/min | Conv. 130–190 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 200–250 m/min | Conv. 170–210 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.18–0.35 mm/rev · Acabado 0.05–0.18 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.5–3.5 mm · Acabado 0.1–0.6 mm</div>
+                            <div class="material-desc">Muy usado en ejes y piezas mecánicas generales. RPM Ø50mm aprox. (Ej): 1019–1592 (CNC a Vc 160–250).</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo recubierto TiCN/TiAlN, geometría general</div>
+                        </div>
+
+                        <div class="material-card" data-search="acero carbono medio 1045 ISO P 150-220 120-190 carburo recubierto">
+                            <div class="material-name">Acero al Carbono Medio — AISI 1045</div>
+                            <span class="material-iso">ISO P</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 140–190 m/min | Conv. 120–160 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 170–220 m/min | Conv. 140–190 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.18–0.35 mm/rev · Acabado 0.06–0.18 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.5–3.0 mm · Acabado 0.1–0.5 mm</div>
+                            <div class="material-desc">Buena resistencia, común en ejes y elementos mecánicos. RPM Ø50mm: 955–1401 (CNC).</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo recubierto TiAlN, positivo para acabado</div>
+                        </div>
+
+                        <div class="material-card" data-search="acero estructural A36 S275 S355 ISO P 140-220 110-180 carburo">
+                            <div class="material-name">Acero Estructural — A36 / S275 / S355</div>
+                            <span class="material-iso">ISO P</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 120–180 m/min | Conv. 100–150 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 160–220 m/min | Conv. 130–180 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.20–0.40 mm/rev · Acabado 0.08–0.20 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 2.0–4.0 mm · Acabado 0.15–0.7 mm</div>
+                            <div class="material-desc">Usado en estructura; buena ductilidad. RPM Ø50mm: 892–1401 (CNC).</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo recubierto de uso general</div>
+                        </div>
+
+                        <div class="material-card" data-search="acero baja aleación 4140 4340 ISO P 120-190 100-160 carburo CVD PVD">
+                            <div class="material-name">Acero de Baja Aleación — AISI 4140 / 4340</div>
+                            <span class="material-iso">ISO P</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 100–160 m/min | Conv. 90–140 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 130–190 m/min | Conv. 110–160 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.18–0.40 mm/rev · Acabado 0.06–0.18 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.5–4.0 mm · Acabado 0.1–0.6 mm</div>
+                            <div class="material-desc">Alta resistencia; usar insertos CVD/PVD multicapa en producción.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo CVD/PVD multicapa</div>
+                        </div>
+
+                        <div class="material-card" data-search="acero cementación 8620 20MnCr5 ISO P 140-200 110-170 carburo">
+                            <div class="material-name">Acero para Cementación — AISI 8620 / 20MnCr5</div>
+                            <span class="material-iso">ISO P</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 120–170 m/min | Conv. 100–140 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 150–200 m/min | Conv. 120–170 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.15–0.35 mm/rev · Acabado 0.05–0.15 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.5–3.0 mm · Acabado 0.1–0.5 mm</div>
+                            <div class="material-desc">Piezas tras cementación; controlar esfuerzo térmico.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo recubierto TiCN/TiAlN</div>
+                        </div>
+
+                        <div class="material-card" data-search="acero alto carbono 1095 52100 ISO P 90-160 70-130 carburo recubierto">
+                            <div class="material-name">Acero Alto Carbono — AISI 1095 / 52100</div>
+                            <span class="material-iso">ISO P</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 70–120 m/min | Conv. 60–100 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 100–160 m/min | Conv. 80–130 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.12–0.30 mm/rev · Acabado 0.04–0.12 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–3.0 mm · Acabado 0.05–0.4 mm</div>
+                            <div class="material-desc">Alta dureza en piezas tratadas; ajustar según estado térmico.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo recubierto TiAlN o CBN para acabados en piezas difíciles</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- ACEROS TEMPLADOS / ISO H  -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="acero templado 35-45 HRC ISO H 90-160 70-130 CBN cerámica">
+                            <div class="material-name">Acero Templado 35–45 HRC</div>
+                            <span class="material-iso">ISO H</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 70–120 m/min | Conv. 60–100 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 90–160 m/min | Conv. 70–130 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.10–0.25 mm/rev · Acabado 0.03–0.10 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.8–2.5 mm · Acabado 0.05–0.3 mm</div>
+                            <div class="material-desc">Requiere insertos de alta dureza; mejores acabados con CBN.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> CBN / cerámica para acabado, carburo PVD para desbaste</div>
+                        </div>
+
+                        <div class="material-card" data-search="acero templado revenido 45-55 HRC ISO H 70-130 55-110 CBN cerámica">
+                            <div class="material-name">Acero Templado y Revenido 45–55 HRC</div>
+                            <span class="material-iso">ISO H</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 55–95 m/min | Conv. 45–85 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 70–130 m/min | Conv. 55–110 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.08–0.18 mm/rev · Acabado 0.03–0.08 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.8–2.0 mm · Acabado 0.03–0.25 mm</div>
+                            <div class="material-desc">Requiere insertos de alta dureza; sensibilidad a vibraciones.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> CBN o cerámica mixta</div>
+                        </div>
+
+                        <div class="material-card" data-search="acero endurecido >55 HRC ISO H 35-80 25-65 CBN cerámica whisker">
+                            <div class="material-name">Acero Endurecido &gt;55 HRC</div>
+                            <span class="material-iso">ISO H</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 25–50 m/min | Conv. 20–40 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 35–80 m/min | Conv. 25–65 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.06–0.12 mm/rev · Acabado 0.02–0.06 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.5–1.5 mm · Acabado 0.01–0.2 mm</div>
+                            <div class="material-desc">Aceros herramienta muy duros; CBN obligatorio para durabilidad.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> CBN (obligatorio para productividad y acabado)</div>
+                        </div>
+
+                        <!-- ============================== -->
+                        <!-- ACEROS INOXIDABLES / ISO M     -->
+                        <!-- ============================== -->
+
+                        <div class="material-card" data-search="inoxidable 303 ISO M 150-240 120-200 carburo">
+                            <div class="material-name">Acero Inoxidable 303</div>
+                            <span class="material-iso">ISO M</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 130–190 m/min | Conv. 110–170 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 180–240 m/min | Conv. 150–200 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.12–0.30 mm/rev · Acabado 0.04–0.12 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–2.5 mm · Acabado 0.05–0.4 mm</div>
+                            <div class="material-desc">Muy maquinable por aditivos; controlar adherencia y temperatura.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo recubierto, geometría positiva; refrigeración frecuente</div>
+                        </div>
+
+                        <div class="material-card" data-search="acero inoxidable austenítico 304 316 ISO M 100-170 80-140 carburo TiAlN refrigeración">
+                            <div class="material-name">Acero Inoxidable Austenítico — 304 / 316</div>
+                            <span class="material-iso">ISO M</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 90–140 m/min | Conv. 80–120 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 120–170 m/min | Conv. 100–140 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.12–0.30 mm/rev · Acabado 0.04–0.12 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–3.0 mm · Acabado 0.05–0.5 mm</div>
+                            <div class="material-desc">Tendencia al work-hardening; usar filo agudo y refrigeración abundante.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo TiAlN con refrigeración adecuada</div>
+                        </div>
+
+                        <div class="material-card" data-search="inoxidable 17-4PH 630 ISO M 80-140 65-120 carburo">
+                            <div class="material-name">Acero Inoxidable Precipitation-Hardened — 17-4PH (630)</div>
+                            <span class="material-iso">ISO M</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 65–110 m/min | Conv. 55–95 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 90–140 m/min | Conv. 75–120 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.10–0.25 mm/rev · Acabado 0.03–0.10 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–2.5 mm · Acabado 0.05–0.4 mm</div>
+                            <div class="material-desc">Usado en aeroespacial; alta tenacidad. Control térmico importante.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo tenaz, preferible control de refrigeración</div>
+                        </div>
+
+                        <div class="material-card" data-search="acero inoxidable martensítico 410 420 ISO M 85-130 65-110 carburo geometría positiva">
+                            <div class="material-name">Acero Inoxidable Martensítico — 410 / 420</div>
+                            <span class="material-iso">ISO M</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 70–100 m/min | Conv. 60–90 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 95–130 m/min | Conv. 75–110 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.12–0.30 mm/rev · Acabado 0.04–0.12 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–2.5 mm · Acabado 0.05–0.4 mm</div>
+                            <div class="material-desc">Más duro que austeníticos; mejor comportamiento de viruta.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo recubierto, geometría positiva</div>
+                        </div>
+
+                        <div class="material-card" data-search="inoxidable duplex 2205 2507 ISO M 70-120 55-100 carburo alta tenacidad">
+                            <div class="material-name">Acero Inoxidable Dúplex — 2205 / 2507</div>
+                            <span class="material-iso">ISO M</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 55–95 m/min | Conv. 45–85 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 70–120 m/min | Conv. 55–100 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.12–0.28 mm/rev · Acabado 0.04–0.12 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–3.0 mm · Acabado 0.05–0.4 mm</div>
+                            <div class="material-desc">Alta resistencia; maquinado exigente, requiere herramientas tenaces.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo alta tenacidad, TiAlN</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- FUNDICIONES / ISO K       -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="fundicion gris GG-20 GG-25 ISO K 80-140 65-120 carburo K10 cerámica seco">
+                            <div class="material-name">Fundición Gris — GG-20 / GG-25</div>
+                            <span class="material-iso">ISO K</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 70–110 m/min | Conv. 60–100 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 100–140 m/min | Conv. 80–120 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.18–0.40 mm/rev · Acabado 0.06–0.18 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.5–4.0 mm · Acabado 0.1–0.6 mm</div>
+                            <div class="material-desc">Viruta quebradiza; buen acabado superficial y estabilidad dimensional.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo K10 / Cerámica (corte seco en producción)</div>
+                        </div>
+
+                        <div class="material-card" data-search="fundicion nodular GGG-40 GGG-60 ISO K 60-110 50-95 carburo K20">
+                            <div class="material-name">Fundición Nodular — GGG-40 / GGG-60</div>
+                            <span class="material-iso">ISO K</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 55–95 m/min | Conv. 45–85 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 80–110 m/min | Conv. 65–95 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.15–0.35 mm/rev · Acabado 0.05–0.15 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.2–3.5 mm · Acabado 0.08–0.4 mm</div>
+                            <div class="material-desc">Más tenaz que fundición gris; ajustar feeds para evitar vibraciones.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo K20 recubierto</div>
+                        </div>
+
+                        <div class="material-card" data-search="fundicion blanca ISO K 30-70 25-55 CBN cerámica">
+                            <div class="material-name">Fundición Blanca (Muy Abrasiva)</div>
+                            <span class="material-iso">ISO K</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 25–50 m/min | Conv. 20–45 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 35–70 m/min | Conv. 25–55 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.06–0.18 mm/rev · Acabado 0.02–0.08 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.5–2.0 mm · Acabado 0.02–0.3 mm</div>
+                            <div class="material-desc">Extremadamente abrasiva; usar CBN o cerámica reforzada; vida de herramienta crítica.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> CBN o cerámica reforzada</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- ALUMINIO / ISO N          -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="aluminio 6061 7075 ISO N 300-700 250-600 PCD carburo pulido">
+                            <div class="material-name">Aluminio Aleado — 6061 / 7075</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 350–600 m/min | Conv. 300–520 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 500–700 m/min | Conv. 450–600 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.18–0.60 mm/rev · Acabado 0.08–0.30 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 2.0–6.0 mm · Acabado 0.1–1.0 mm</div>
+                            <div class="material-desc">Muy común en CNC; excelente acabado con herramientas pulidas (PCD o carburo pulido).</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> PCD o carburo pulido espejo; filo agudo</div>
+                        </div>
+
+                        <div class="material-card" data-search="aluminio 2011 ISO N 350-800 300-650 PCD carburo pulido">
+                            <div class="material-name">Aluminio 2011 (Alta Maquinabilidad)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 400–700 m/min | Conv. 350–650 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 600–800 m/min | Conv. 500–700 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.20–0.80 mm/rev · Acabado 0.10–0.35 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 2.5–6.0 mm · Acabado 0.1–1.2 mm</div>
+                            <div class="material-desc">Uno de los mejores para torno; admite velocidades muy altas con PCD.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> PCD o Carburo pulido</div>
+                        </div>
+
+                        <div class="material-card" data-search="aluminio 5083 ISO N 200-450 180-380 carburo pulido">
+                            <div class="material-name">Aluminio 5083 (Marino)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 250–380 m/min | Conv. 200–320 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 350–450 m/min | Conv. 280–380 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.18–0.50 mm/rev · Acabado 0.08–0.25 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 2.0–5.0 mm · Acabado 0.1–1.0 mm</div>
+                            <div class="material-desc">Más pegajoso; filo muy afilado y refrigeración controlada.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo pulido, geometría positiva</div>
+                        </div>
+
+                        <div class="material-card" data-search="aluminio puro 1050 1100 ISO N 400-900 300-700 PCD carburo K10">
+                            <div class="material-name">Aluminio Puro — 1050 / 1100</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 450–800 m/min | Conv. 350–700 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 700–900 m/min | Conv. 550–700 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.25–0.80 mm/rev · Acabado 0.10–0.35 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 2.5–8.0 mm · Acabado 0.1–1.5 mm</div>
+                            <div class="material-desc">Muy blando; cuidado con adherencia; ideal PCD en producción alta.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> PCD, Carburo K10 pulido espejo</div>
+                        </div>
+
+                        <div class="material-card" data-search="aluminio fundido A356 A380 ISO N 200-400 150-350 PCD carburo">
+                            <div class="material-name">Aluminio Fundido — A356 / A380</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 220–350 m/min | Conv. 180–300 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 300–400 m/min | Conv. 220–350 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.20–0.60 mm/rev · Acabado 0.08–0.30 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 2.0–6.0 mm · Acabado 0.1–1.0 mm</div>
+                            <div class="material-desc">Abrasivo por Si; PCD recomendado para series largas.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> PCD recomendado, Carburo en prototipos</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- COBRE Y ALEACIONES / ISO N -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="laton C36000 ISO N 150-300 120-250 HSS carburo">
+                            <div class="material-name">Latón — C36000</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 160–260 m/min | Conv. 140–230 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 220–300 m/min | Conv. 180–250 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.12–0.40 mm/rev · Acabado 0.05–0.18 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–3.5 mm · Acabado 0.05–0.6 mm</div>
+                            <div class="material-desc">Excelente acabado y viruta corta; admite HSS o carburo sin recubrimiento.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> HSS o Carburo sin recubrimiento, geometría positiva</div>
+                        </div>
+
+                        <div class="material-card" data-search="cobre electrolitico C11000 ISO N 70-120 55-100 carburo pulido">
+                            <div class="material-name">Cobre Electrolítico — C11000</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 80–110 m/min | Conv. 65–95 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 100–120 m/min | Conv. 80–100 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.12–0.30 mm/rev · Acabado 0.05–0.15 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–3.0 mm · Acabado 0.05–0.5 mm</div>
+                            <div class="material-desc">Muy dúctil, tiende a formar virutas largas; herramienta pulida y geometría positiva.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo pulido, geometría positiva</div>
+                        </div>
+
+                        <div class="material-card" data-search="cobre berilio ISO N 40-90 35-75 carburo recubierto">
+                            <div class="material-name">Cobre-Beryl — (aleación de cobre-berilio)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 45–80 m/min | Conv. 40–70 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 70–90 m/min | Conv. 55–75 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.10–0.28 mm/rev · Acabado 0.04–0.12 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–3.0 mm · Acabado 0.05–0.4 mm</div>
+                            <div class="material-desc">Alta resistencia; usar refrigeración y carburo recubierto para vida herramienta.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo recubierto; refrigeración recomendada</div>
+                        </div>
+
+                        <div class="material-card" data-search="bronce C93200 ISO N 60-150 50-120 HSS carburo K20">
+                            <div class="material-name">Bronce (C93200)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 70–130 m/min | Conv. 60–110 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 100–150 m/min | Conv. 80–120 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.12–0.35 mm/rev · Acabado 0.04–0.12 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–3.0 mm · Acabado 0.05–0.5 mm</div>
+                            <div class="material-desc">Buen comportamiento frente a desgaste; usar carburo K20 o HSS en lotes pequeños.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo K20 / HSS</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- TITANIO / ISO S           -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="titanio grado 2 ISO S 45-85 35-70 carburo PVD">
+                            <div class="material-name">Titanio Grado 2 (puro)</div>
+                            <span class="material-iso">ISO S</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 35–65 m/min | Conv. 30–55 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 55–85 m/min | Conv. 40–70 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.08–0.25 mm/rev · Acabado 0.04–0.12 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.5–2.5 mm · Acabado 0.05–0.6 mm</div>
+                            <div class="material-desc">Mejor maquinabilidad que Ti-6Al-4V; controlar fricción y temperaturas.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo PVD TiAlN; refrigeración moderada</div>
+                        </div>
+
+                        <div class="material-card" data-search="titanio grado 5 Ti-6Al-4V ISO S 35-75 25-60 carburo refrigeración HP">
+                            <div class="material-name">Titanio Grado 5 — Ti-6Al-4V</div>
+                            <span class="material-iso">ISO S</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 30–55 m/min | Conv. 25–50 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 45–75 m/min | Conv. 30–60 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.06–0.20 mm/rev · Acabado 0.03–0.10 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.5–2.0 mm · Acabado 0.03–0.4 mm</div>
+                            <div class="material-desc">Aleación aeroespacial exigente; refrigeración HP y control de sobremetal.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo PVD; refrigeración alta (HP) recomendada</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- SUPER ALEACIONES / ISO S  -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="inconel 718 ISO S 20-45 15-35 carburo cerámica Si3N4">
+                            <div class="material-name">Inconel 718</div>
+                            <span class="material-iso">ISO S</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 18–35 m/min | Conv. 15–30 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 28–45 m/min | Conv. 20–35 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.06–0.16 mm/rev · Acabado 0.03–0.10 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.5–2.0 mm · Acabado 0.03–0.4 mm</div>
+                            <div class="material-desc">Muy difícil; temperaturas de corte elevadas; usar herramientas resistentes al calor.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo alto cobalto / Cerámica Si₃N₄</div>
+                        </div>
+
+                        <div class="material-card" data-search="hastelloy C-276 ISO S 18-40 14-32 carburo tenaz refrigeración">
+                            <div class="material-name">Hastelloy C-276</div>
+                            <span class="material-iso">ISO S</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 16–30 m/min | Conv. 14–26 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 25–40 m/min | Conv. 18–32 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.06–0.14 mm/rev · Acabado 0.03–0.09 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.5–1.8 mm · Acabado 0.03–0.3 mm</div>
+                            <div class="material-desc">Aleación Ni-Cr-Mo; refrigeración alta y herramientas tenaces necesarias.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo tenaz; refrigeración HP</div>
+                        </div>
+
+                        <div class="material-card" data-search="monel 400 ISO S 25-55 20-45 carburo TiAlN">
+                            <div class="material-name">Monel 400</div>
+                            <span class="material-iso">ISO S</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 22–45 m/min | Conv. 20–40 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 35–55 m/min | Conv. 25–45 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.08–0.18 mm/rev · Acabado 0.03–0.10 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.6–2.0 mm · Acabado 0.03–0.4 mm</div>
+                            <div class="material-desc">Aleación Ni-Cu; buena resistencia a corrosión, maquinado moderado.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo recubierto TiAlN</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- MAGNESIO / ISO N          -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="magnesio AZ31 AZ91 ISO N 400-1000 300-800 HSS carburo seco ignición">
+                            <div class="material-name">Magnesio (AZ31 / AZ91)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 500–900 m/min | Conv. 400–800 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 800–1000 m/min | Conv. 600–800 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.25–0.80 mm/rev · Acabado 0.10–0.35 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 2.0–6.0 mm · Acabado 0.1–1.0 mm</div>
+                            <div class="material-desc">Muy fácil de maquinar pero riesgo de ignición; preferir corte seco y eliminar chispas.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo o HSS (CORTE SECO con precauciones)</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- PLÁSTICOS / ISO N         -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="ptfe teflon ISO N 200-600 150-500 HSS carburo afilado">
+                            <div class="material-name">PTFE (Teflón)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 220–450 m/min | Conv. 180–380 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 350–600 m/min | Conv. 250–500 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.20–0.60 mm/rev · Acabado 0.08–0.30 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–4.0 mm · Acabado 0.1–1.0 mm</div>
+                            <div class="material-desc">Muy blando y deformable; evitar sobrecalentamiento y usar filo afilado.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> HSS afilado / Carburo pulido</div>
+                        </div>
+
+                        <div class="material-card" data-search="uhmw polietileno ISO N 200-500 150-400 HSS carburo">
+                            <div class="material-name">UHMW (Polietileno Alta Densidad)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 220–420 m/min | Conv. 180–360 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 300–500 m/min | Conv. 220–400 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.30–0.80 mm/rev · Acabado 0.10–0.35 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 2.0–6.0 mm · Acabado 0.1–1.0 mm</div>
+                            <div class="material-desc">Flexible; viruta larga tipo cinta; mantener control de sujeción.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> HSS o Carburo muy afilado</div>
+                        </div>
+
+                        <div class="material-card" data-search="pvc ISO N 80-250 60-200 HSS carburo">
+                            <div class="material-name">PVC (Plástico Industrial)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 100–200 m/min | Conv. 80–160 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 160–250 m/min | Conv. 120–200 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.20–0.60 mm/rev · Acabado 0.08–0.30 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–4.0 mm · Acabado 0.1–1.0 mm</div>
+                            <div class="material-desc">No sobrecalentar; puede deformarse; buena sujeción necesaria.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> HSS afilado / Carburo pulido</div>
+                        </div>
+
+                        <div class="material-card" data-search="abs ISO N 120-300 90-250 HSS carburo">
+                            <div class="material-name">ABS</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 140–260 m/min | Conv. 110–210 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 200–300 m/min | Conv. 150–250 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.20–0.60 mm/rev · Acabado 0.08–0.30 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–4.0 mm · Acabado 0.1–1.0 mm</div>
+                            <div class="material-desc">Buen plástico para mecanizar; evitar sobremesa térmica.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> HSS o Carburo pulido</div>
+                        </div>
+
+                        <div class="material-card" data-search="peek ISO N 120-300 90-250 carburo PCD">
+                            <div class="material-name">PEEK (Plástico de Ingeniería)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 150–260 m/min | Conv. 120–220 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 220–300 m/min | Conv. 170–250 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.12–0.45 mm/rev · Acabado 0.05–0.20 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–4.0 mm · Acabado 0.1–1.0 mm</div>
+                            <div class="material-desc">Resistente a temperatura; requiere herramientas pulidas y control térmico.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo pulido / PCD en producción</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- COMPUESTOS / ISO N        -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="fibra carbono CFRP ISO N 100-220 80-180 PCD diamante abrasivo">
+                            <div class="material-name">Fibra de Carbono (CFRP)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 90–160 m/min | Conv. 80–140 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 140–220 m/min | Conv. 100–180 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.05–0.25 mm/rev · Acabado 0.02–0.10 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.5–2.0 mm · Acabado 0.05–0.4 mm (preferir pasadas múltiples pequeñas)</div>
+                            <div class="material-desc">Extremadamente abrasivo; desgaste rápido—PCD/diamante obligatorio para productividad.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> PCD/diamante; control de polvo y aspiración</div>
+                        </div>
+
+                        <div class="material-card" data-search="grafito ISO N 200-500 150-400 carburo PCD polvo abrasivo">
+                            <div class="material-name">Grafito</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 200–400 m/min | Conv. 150–320 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 300–500 m/min | Conv. 220–400 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.20–0.60 mm/rev · Acabado 0.08–0.30 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–5.0 mm · Acabado 0.1–1.0 mm</div>
+                            <div class="material-desc">Electrodos EDM; polvo abrasivo—usar herramientas de grano fino o PCD.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo grano fino / PCD</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- MATERIALS ADICIONALES     -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="acero herramienta D2 H13 ISO H herramientas 40-60 25-50 CBN carburo">
+                            <div class="material-name">Acero para Herramientas (D2, H13)</div>
+                            <span class="material-iso">ISO H / P según dureza</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 40–90 m/min | Conv. 30–80 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 60–130 m/min | Conv. 45–100 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.06–0.20 mm/rev · Acabado 0.02–0.08 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.6–2.5 mm · Acabado 0.02–0.4 mm</div>
+                            <div class="material-desc">Ajustar según % de dureza; tratar como ISO H si endurecido.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo duro para desbaste, CBN para acabado</div>
+                        </div>
+
+                        <div class="material-card" data-search="silumin al-sí 319 356 ISO N 180-350 150-300 PCD carburo">
+                            <div class="material-name">Silumin / Al-Si (ej. 319, A356)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 200–320 m/min | Conv. 160–280 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 300–420 m/min | Conv. 220–360 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.18–0.60 mm/rev · Acabado 0.08–0.30 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.5–5.0 mm · Acabado 0.1–1.0 mm</div>
+                            <div class="material-desc">Abrasivo por presencia de Si; PCD recomendado en producción.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> PCD o Carburo resistente a abrasión</div>
+                        </div>
+
+                        <div class="material-card" data-search="nimonic inconel 80 haynes ISO S 15-40 12-35 carburo ceramica">
+                            <div class="material-name">Nimonic / Haynes (superaleaciones)</div>
+                            <span class="material-iso">ISO S</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 15–30 m/min | Conv. 12–28 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 25–40 m/min | Conv. 18–35 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.05–0.14 mm/rev · Acabado 0.02–0.08 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.5–1.8 mm · Acabado 0.03–0.4 mm</div>
+                            <div class="material-desc">Superaleaciones resistentes a temperatura; cortar lento y con herramientas resistentes.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo tenaz / Cerámica, refrigeración HP</div>
+                        </div>
+
+                        <div class="material-card" data-search="fibra vidrio gfrp ISO N 80-160 70-140 PCD abrasivo">
+                            <div class="material-name">Fibra de Vidrio (GFRP)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 80–140 m/min | Conv. 70–120 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 100–160 m/min | Conv. 80–140 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.05–0.25 mm/rev · Acabado 0.02–0.10 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.5–2.0 mm · Acabado 0.05–0.4 mm</div>
+                            <div class="material-desc">Abrasivo y delicado; usar PCD/diamante y extracción de polvo.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> PCD/diamante; protección respiratoria y extracción</div>
+                        </div>
+                        <!-- ========================= -->
+                        <!-- ACEROS INOX ESPECIALES    -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="inoxidable 316L austenitico ISO M 90-160 75-130 carburo TiAlN refrigeracion">
+                            <div class="material-name">Acero Inoxidable 316L</div>
+                            <span class="material-iso">ISO M</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 80–125 m/min | Conv. 70–110 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 120–160 m/min | Conv. 95–130 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.10–0.28 mm/rev · Acabado 0.04–0.12 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–3.0 mm · Acabado 0.05–0.5 mm</div>
+                            <div class="material-desc">Más resistente a corrosión que 304, pero más exigente en corte. Evitar recalentamiento.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo TiAlN, refrigeración abundante</div>
+                        </div>
+
+                        <div class="material-card" data-search="inoxidable 321 ISO M 90-160 75-130 carburo refrigeracion alta">
+                            <div class="material-name">Acero Inoxidable 321</div>
+                            <span class="material-iso">ISO M</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 85–130 m/min | Conv. 70–110 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 120–160 m/min | Conv. 95–130 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.10–0.28 mm/rev · Acabado 0.04–0.12 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.0–2.8 mm · Acabado 0.05–0.45 mm</div>
+                            <div class="material-desc">Inox estabilizado con titanio, usado en alta temperatura. Similar a 304 pero más duro.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo recubierto TiAlN, geometría positiva</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- HIERRO Y METALES BLANDOS  -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="hierro forjado ISO P 80-140 60-120 carburo hss">
+                            <div class="material-name">Hierro Forjado</div>
+                            <span class="material-iso">ISO P</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 70–110 m/min | Conv. 60–95 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 100–140 m/min | Conv. 80–120 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.15–0.35 mm/rev · Acabado 0.06–0.18 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.5–4.0 mm · Acabado 0.1–0.6 mm</div>
+                            <div class="material-desc">Material fibroso, puede generar vibraciones; usar insertos tenaces y sujeción firme.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo recubierto o HSS en torno convencional</div>
+                        </div>
+
+                        <div class="material-card" data-search="zinc zamak ISO N 200-500 150-420 carburo hss">
+                            <div class="material-name">Zinc / Zamak</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 250–420 m/min | Conv. 200–350 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 350–500 m/min | Conv. 280–420 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.18–0.55 mm/rev · Acabado 0.08–0.25 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 2.0–6.0 mm · Acabado 0.1–1.0 mm</div>
+                            <div class="material-desc">Muy fácil de maquinar, buena viruta; cuidado con sobrecalentamiento y deformación.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo pulido o HSS afilado</div>
+                        </div>
+
+                        <div class="material-card" data-search="plomo ISO N 150-400 120-320 hss carburo">
+                            <div class="material-name">Plomo (Pb)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 180–320 m/min | Conv. 150–280 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 250–400 m/min | Conv. 200–320 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.20–0.80 mm/rev · Acabado 0.10–0.40 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 2.0–8.0 mm · Acabado 0.1–1.5 mm</div>
+                            <div class="material-desc">Muy blando y pesado; excelente maquinabilidad pero requiere seguridad por toxicidad.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> HSS o Carburo muy afilado</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- METALES REFRACTARIOS ISO S -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="tungsteno wolframio ISO S 10-25 8-20 carburo CBN refrigeracion">
+                            <div class="material-name">Tungsteno / Wolframio (W)</div>
+                            <span class="material-iso">ISO S</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 8–18 m/min | Conv. 6–15 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 12–25 m/min | Conv. 8–20 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.04–0.12 mm/rev · Acabado 0.02–0.06 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.3–1.2 mm · Acabado 0.01–0.2 mm</div>
+                            <div class="material-desc">Extremadamente duro y resistente al calor; velocidades bajas obligatorias.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo tenaz o CBN, refrigeración recomendada</div>
+                        </div>
+
+                        <div class="material-card" data-search="molibdeno ISO S 20-50 15-40 carburo refrigeracion">
+                            <div class="material-name">Molibdeno (Mo)</div>
+                            <span class="material-iso">ISO S</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 18–35 m/min | Conv. 15–30 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 30–50 m/min | Conv. 20–40 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.05–0.14 mm/rev · Acabado 0.02–0.08 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.5–1.8 mm · Acabado 0.02–0.3 mm</div>
+                            <div class="material-desc">Metal refractario usado en industria aeroespacial; genera calor concentrado en el filo.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo recubierto, refrigeración moderada</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- ALEACIONES DE NIQUEL ISO S -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="inconel 625 ISO S 20-50 15-40 carburo ceramica refrigeracion alta">
+                            <div class="material-name">Inconel 625</div>
+                            <span class="material-iso">ISO S</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 18–38 m/min | Conv. 15–32 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 30–50 m/min | Conv. 20–40 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.06–0.16 mm/rev · Acabado 0.03–0.10 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.5–2.0 mm · Acabado 0.03–0.4 mm</div>
+                            <div class="material-desc">Similar a 718 pero más dúctil; tiende a adherirse al filo. Cortar con parámetros estables.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo alto cobalto o cerámica, refrigeración HP</div>
+                        </div>
+
+                        <div class="material-card" data-search="incoloy 825 ISO S 20-55 15-45 carburo TiAlN">
+                            <div class="material-name">Incoloy 825</div>
+                            <span class="material-iso">ISO S</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 20–40 m/min | Conv. 18–35 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 35–55 m/min | Conv. 25–45 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.06–0.18 mm/rev · Acabado 0.03–0.10 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.6–2.2 mm · Acabado 0.03–0.4 mm</div>
+                            <div class="material-desc">Aleación resistente a corrosión química; requiere herramientas tenaces y buena rigidez.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo recubierto TiAlN, refrigeración recomendada</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- METALES NO FERROSOS ISO N -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="niquel puro ISO N 40-110 30-90 carburo">
+                            <div class="material-name">Níquel Puro</div>
+                            <span class="material-iso">ISO N / S</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 35–75 m/min | Conv. 30–65 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 60–110 m/min | Conv. 45–90 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.08–0.22 mm/rev · Acabado 0.03–0.10 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.8–2.5 mm · Acabado 0.03–0.4 mm</div>
+                            <div class="material-desc">Material pegajoso, tiende a formar filo recrecido; usar filo afilado y refrigeración.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Carburo recubierto, geometría positiva</div>
+                        </div>
+
+                        <div class="material-card" data-search="estano ISO N 150-450 120-350 hss carburo">
+                            <div class="material-name">Estaño (Sn)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 200–350 m/min | Conv. 150–300 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 300–450 m/min | Conv. 220–350 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.20–0.80 mm/rev · Acabado 0.10–0.35 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 2.0–6.0 mm · Acabado 0.1–1.2 mm</div>
+                            <div class="material-desc">Muy blando; excelente acabado pero se deforma fácilmente si hay presión excesiva.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> HSS afilado o Carburo pulido</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- PLÁSTICOS AVANZADOS       -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="nylon poliamida pa6 pa66 ISO N 150-450 120-380 hss carburo">
+                            <div class="material-name">Nylon (PA6 / PA66)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 180–350 m/min | Conv. 150–300 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 300–450 m/min | Conv. 220–380 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.25–0.80 mm/rev · Acabado 0.10–0.40 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 2.0–7.0 mm · Acabado 0.1–1.5 mm</div>
+                            <div class="material-desc">Absorbe humedad y se expande; usar herramientas muy afiladas para evitar rebabas.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> HSS afilado o Carburo pulido</div>
+                        </div>
+
+                        <div class="material-card" data-search="delrin pom acetal ISO N 200-550 150-450 hss carburo pulido">
+                            <div class="material-name">Delrin / POM (Acetal)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 220–420 m/min | Conv. 180–350 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 350–550 m/min | Conv. 250–450 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.25–0.90 mm/rev · Acabado 0.10–0.40 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 2.0–8.0 mm · Acabado 0.1–1.5 mm</div>
+                            <div class="material-desc">Excelente plástico para mecanizado; da buen acabado superficial y viruta estable.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> HSS o Carburo pulido espejo</div>
+                        </div>
+
+                        <div class="material-card" data-search="policarbonato pc ISO N 120-350 100-280 hss carburo">
+                            <div class="material-name">Policarbonato (PC)</div>
+                            <span class="material-iso">ISO N</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 140–260 m/min | Conv. 120–220 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 220–350 m/min | Conv. 180–280 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.20–0.70 mm/rev · Acabado 0.08–0.35 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 1.5–5.0 mm · Acabado 0.1–1.2 mm</div>
+                            <div class="material-desc">Resistente pero se derrite si se calienta; usar pasadas limpias y herramienta afilada.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> HSS afilado o Carburo pulido</div>
+                        </div>
+
+                        <!-- ========================= -->
+                        <!-- MATERIALES CERÁMICOS      -->
+                        <!-- ========================= -->
+
+                        <div class="material-card" data-search="ceramica al2o3 alúmina ISO H 20-80 15-60 diamante pcd abrasivo">
+                            <div class="material-name">Cerámica (Alúmina - Al₂O₃)</div>
+                            <span class="material-iso">ISO H</span>
+                            <div class="material-speeds">
+                                <div><strong>Desbaste:</strong> CNC 15–35 m/min | Conv. 12–30 m/min</div>
+                                <div><strong>Acabado:</strong> CNC 30–80 m/min | Conv. 20–60 m/min</div>
+                            </div>
+                            <div class="material-feed"><strong>Avance recomendado:</strong> Desbaste 0.02–0.08 mm/rev · Acabado 0.01–0.04 mm/rev</div>
+                            <div class="material-ap"><strong>Profundidad de corte (ap):</strong> Desbaste 0.2–1.0 mm · Acabado 0.01–0.2 mm</div>
+                            <div class="material-desc">Muy frágil y abrasiva; se recomienda trabajar con herramienta diamantada.</div>
+                            <div class="material-tool"><strong>Herramienta:</strong> Diamante / PCD (preferible), pasadas pequeñas</div>
+                        </div>
+
+                    </div>
+
+                    <div class="no-results" id="noResults" style="display: none;">
+                        No se encontraron materiales que coincidan con tu búsqueda
+                    </div>
+
+                    <div class="highlight-box" style="margin-top: 2rem;">
+                        <p><strong>Notas sobre velocidades y parámetros:</strong></p>
+                        <ul style="margin-left: 1.2rem;">
+                            <li>• Los rangos indicados son orientativos y deben ajustarse según la máquina, rigidez, estado de filo, refrigeración, herramienta y diámetro real de la pieza.</li>
+                            <li>• RPM calculadas para diámetro de 50mm usando: RPM = (1000 × Vc) / (π × D). Usa diámetros y Vc reales para calcular n exacta.</li>
+                            <li>• Avance (mm/rev) y ap (mm) están separados para <em>desbaste</em> (mayor remoción) y <em>acabado</em> (mejor calidad superficial).</li>
+                            <li>• Para CNC con control G96 (velocidad constante) los valores CNC pueden optimizarse y ser más altos en acabados.</li>
+                            <li>• Refrigeración recomendada para aceros inoxidables, titanio, superaleaciones y cobre-berilio. Para plásticos y magnesio seguir normas de seguridad (riesgo de ignición y deformación).</li>
+                            <li>• Herramientas: PCD para plásticos blandos y materiales abrasivos en producción; CBN para aceros endurecidos y cerámica para altas temperaturas; carburo recubierto para uso general.</li>
+                            <li>• Siempre validar con una pasada de prueba, medir temperatura, vibración y desgaste de la herramienta; ajustar parámetros en consecuencia.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- SIMULATION PAGE -->
+        <div id="simulation" class="page">
+            <div class="mode-selector">
+                <button class="mode-btn active" onclick="setMode('desbaste')">DESBASTE</button>
+                <button class="mode-btn" onclick="setMode('acabado')">ACABADO</button>
+            </div>
+
+            <div class="simulator-grid">
+                <!-- CNC Lathe -->
+                <div class="sim-card">
+                    <div class="sim-header">
+                        <h2 class="sim-title">Torno CNC</h2>
+                        <span class="sim-badge">AUTOMÁTICO</span>
+                    </div>
+                    
+                    <div class="material-selector">
+                        <div class="control-label">
+                            <span class="label-text">Material a tornear</span>
+                        </div>
+                        <select id="cncMaterial" onchange="updateCNCMaterial()">
+                            <option value="steel">Acero Dulce 1018/1020 (160-250 m/min)</option>
+                            <option value="steel_1045">Acero 1045 (140-220 m/min)</option>
+                            <option value="lowalloy">Acero Baja Aleación 4140/4340 (100-190 m/min)</option>
+                            <option value="hardened_35">Acero Templado 35-45 HRC (70-160 m/min)</option>
+                            <option value="hardened_45">Acero Templado 45-55 HRC (55-130 m/min)</option>
+                            <option value="hardened_55">Acero Endurecido >55 HRC (25-80 m/min)</option>
+                            <option value="stainless_303">Acero Inoxidable 303 (130-240 m/min)</option>
+                            <option value="stainless">Acero Inox. 304/316 (90-170 m/min)</option>
+                            <option value="stainless_m">Acero Inox. 410/420 (70-130 m/min)</option>
+                            <option value="stainless_174">Acero Inox. 17-4PH (65-140 m/min)</option>
+                            <option value="cast">Fundición Gris (70-140 m/min)</option>
+                            <option value="nodular">Fundición Nodular (55-110 m/min)</option>
+                            <option value="aluminum">Aluminio 6061/7075 (350-700 m/min)</option>
+                            <option value="aluminum_2011">Aluminio 2011 (400-800 m/min)</option>
+                            <option value="aluminum_pure">Aluminio Puro (450-900 m/min)</option>
+                            <option value="brass">Latón C36000 (160-300 m/min)</option>
+                            <option value="copper">Cobre Electrolítico (80-120 m/min)</option>
+                            <option value="bronze">Bronce C93200 (70-150 m/min)</option>
+                            <option value="titanium">Titanio Ti-6Al-4V (30-75 m/min)</option>
+                            <option value="titanium_2">Titanio Grado 2 (35-85 m/min)</option>
+                            <option value="inconel">Inconel 718 (18-45 m/min)</option>
+                            <option value="hastelloy">Hastelloy C-276 (16-40 m/min)</option>
+                            <option value="magnesium">Magnesio (500-1000 m/min)</option>
+                            <option value="plastic">Plásticos (100-300 m/min)</option>
+                        </select>
+                    </div>
+
+                    <div class="lathe-canvas">
+                        <div class="machine-base"></div>
+                        <div class="headstock">
+                            <div class="spindle"></div>
+                            <div class="chuck">
+                                <div class="chuck-jaw"></div>
+                                <div class="chuck-jaw"></div>
+                            </div>
+                        </div>
+                        <div class="cnc-screen">
+                            <div class="screen-display" id="cncScreenDisplay">G96 S<span id="screenVc">180</span>
+F<span id="screenFeed">0.25</span>
+X<span id="screenX">50.0</span>
+Z<span id="screenZ">100.0</span>
+TOOL 01
+RPM:<span id="screenRPM">1146</span></div>
+                        </div>
+                        <div class="cnc-status-display">READY
+AUTO</div>
+                        <div class="cnc-control-panel">
+                            <div class="cnc-button active"></div>
+                            <div class="cnc-button active"></div>
+                            <div class="cnc-button"></div>
+                            <div class="cnc-button active"></div>
+                            <div class="cnc-button"></div>
+                            <div class="cnc-button"></div>
+                            <div class="cnc-button active"></div>
+                            <div class="cnc-button"></div>
+                        </div>
+                        <div class="cnc-turret"></div>
+                        <div class="carriage-rail"></div>
+                        <div class="workpiece spinning" id="cncWorkpiece">
+                            <div class="workpiece-outer">
+                                <div class="cylinder">
+                                    <div class="machining-marks"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tool-post" id="cncToolPost">
+                            <div class="tool-holder">
+                                <div class="cutting-tool" id="cncCuttingTool"></div>
+                            </div>
+                        </div>
+                        <div class="coolant" id="cncCoolant">
+                            <div class="coolant-stream"></div>
+                            <div class="coolant-stream"></div>
+                            <div class="coolant-stream"></div>
+                        </div>
+                        <div class="sparks" id="cncSparks">
+                            <div class="spark"></div>
+                            <div class="spark"></div>
+                            <div class="spark"></div>
+                            <div class="spark"></div>
+                            <div class="spark"></div>
+                        </div>
+                        <div class="tailstock"></div>
+                        <div class="chips" id="cncChips">
+                            <div class="chip"></div>
+                            <div class="chip"></div>
+                            <div class="chip"></div>
+                            <div class="chip"></div>
+                            <div class="chip"></div>
+                        </div>
+                    </div>
+
+                    <div class="stats-panel">
+                        <div class="stat-bubble" id="cncRPMBubble">
+                            <div class="stat-label">RPM</div>
+                            <div class="stat-value" id="cncRPMStat">1146</div>
+                            <div class="stat-unit">rev/min</div>
+                        </div>
+                        <div class="stat-bubble" id="cncMRRBubble">
+                            <div class="stat-label">MRR</div>
+                            <div class="stat-value" id="cncMRRStat">0.0</div>
+                            <div class="stat-unit">cm³/min</div>
+                        </div>
+                        <div class="stat-bubble optimal" id="cncStatusBubble">
+                            <div class="stat-label">Estado</div>
+                            <div class="stat-value optimal" id="cncStatusStat">ÓPTIMO</div>
+                        </div>
+                    </div>
+
+                    <div class="alert-box alert-optimal" id="cncAlertOptimal">
+                        <strong>Parámetros óptimos:</strong> Los valores están dentro del rango recomendado para este material.
+                    </div>
+                    <div class="alert-box alert-warning" id="cncAlertWarning">
+                        <strong>Advertencia:</strong> <span id="cncWarningText"></span>
+                    </div>
+                    <div class="alert-box alert-danger" id="cncAlertDanger">
+                        <strong>Peligro:</strong> <span id="cncDangerText"></span>
+                    </div>
+
+                    <div class="status-info">
+                        <strong>Modo G96 Activo:</strong> Velocidad de corte constante. El CNC ajusta automáticamente las RPM conforme cambia el diámetro de la pieza.
+                    </div>
+
+                    <div class="controls">
+                        <div class="control-group">
+                            <div class="control-label">
+                                <span class="label-text">Velocidad de Avance (f)</span>
+                                <span class="label-value" id="cncFeedValue">0.25 mm/rev</span>
+                            </div>
+                            <input type="range" class="slider" id="cncFeed" min="0.05" max="0.60" step="0.01" value="0.25" oninput="updateCNC()">
+                            <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-light);">
+                                Rango recomendado para <span id="cncModeText">desbaste</span>: <span id="cncFeedRange">0.25-0.60 mm/rev</span>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-label">
+                                <span class="label-text">Profundidad de Corte (ap)</span>
+                                <span class="label-value" id="cncDepthValue">2.0 mm</span>
+                            </div>
+                            <input type="range" class="slider" id="cncDepth" min="0.1" max="8.0" step="0.1" value="2.0" oninput="updateCNC()">
+                            <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-light);">
+                                Rango recomendado para <span id="cncModeText2">desbaste</span>: <span id="cncDepthRange">2.0-8.0 mm</span>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-label">
+                                <span class="label-text">Velocidad de Corte (Vc)</span>
+                                <span class="label-value" id="cncSpeedValue">180 m/min</span>
+                            </div>
+                            <input type="range" class="slider" id="cncSpeed" min="50" max="600" step="10" value="180" oninput="updateCNC()">
+                            <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-light);">
+                                Rango para material seleccionado: <span id="cncSpeedRange">150-220 m/min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conventional Lathe -->
+                <div class="sim-card">
+                    <div class="sim-header">
+                        <h2 class="sim-title">Torno Convencional</h2>
+                        <span class="sim-badge" style="background: var(--ipn-guinda-dark);">MANUAL</span>
+                    </div>
+
+                    <div class="material-selector">
+                        <div class="control-label">
+                            <span class="label-text">Material a tornear</span>
+                        </div>
+                        <select id="cncMaterial" onchange="updateCNCMaterial()">
+                            <option value="steel">Acero Dulce 1018/1020 (160-250 m/min)</option>
+                            <option value="steel_1045">Acero 1045 (140-220 m/min)</option>
+                            <option value="lowalloy">Acero Baja Aleación 4140/4340 (100-190 m/min)</option>
+                            <option value="hardened_35">Acero Templado 35-45 HRC (70-160 m/min)</option>
+                            <option value="hardened_45">Acero Templado 45-55 HRC (55-130 m/min)</option>
+                            <option value="hardened_55">Acero Endurecido >55 HRC (25-80 m/min)</option>
+                            <option value="stainless_303">Acero Inoxidable 303 (130-240 m/min)</option>
+                            <option value="stainless">Acero Inox. 304/316 (90-170 m/min)</option>
+                            <option value="stainless_m">Acero Inox. 410/420 (70-130 m/min)</option>
+                            <option value="stainless_174">Acero Inox. 17-4PH (65-140 m/min)</option>
+                            <option value="cast">Fundición Gris (70-140 m/min)</option>
+                            <option value="nodular">Fundición Nodular (55-110 m/min)</option>
+                            <option value="aluminum">Aluminio 6061/7075 (350-700 m/min)</option>
+                            <option value="aluminum_2011">Aluminio 2011 (400-800 m/min)</option>
+                            <option value="aluminum_pure">Aluminio Puro (450-900 m/min)</option>
+                            <option value="brass">Latón C36000 (160-300 m/min)</option>
+                            <option value="copper">Cobre Electrolítico (80-120 m/min)</option>
+                            <option value="bronze">Bronce C93200 (70-150 m/min)</option>
+                            <option value="titanium">Titanio Ti-6Al-4V (30-75 m/min)</option>
+                            <option value="titanium_2">Titanio Grado 2 (35-85 m/min)</option>
+                            <option value="inconel">Inconel 718 (18-45 m/min)</option>
+                            <option value="hastelloy">Hastelloy C-276 (16-40 m/min)</option>
+                            <option value="magnesium">Magnesio (500-1000 m/min)</option>
+                            <option value="plastic">Plásticos (100-300 m/min)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="lathe-canvas">
+                        <div class="machine-base"></div>
+                        <div class="headstock">
+                            <div class="spindle"></div>
+                            <div class="chuck">
+                                <div class="chuck-jaw"></div>
+                                <div class="chuck-jaw"></div>
+                            </div>
+                        </div>
+                        <div class="gear-lever"></div>
+                        <div class="hand-wheel wheel-longitudinal" id="convWheelLong"></div>
+                        <div class="hand-wheel wheel-transversal" id="convWheelTrans"></div>
+                        <div class="conv-lever"></div>
+                        <div class="conv-dial">
+                            <div class="conv-dial-pointer"></div>
+                        </div>
+                        <div class="oil-reservoir"></div>
+                        <div class="carriage-rail"></div>
+                        <div class="workpiece spinning" id="convWorkpiece">
+                            <div class="workpiece-outer">
+                                <div class="cylinder">
+                                    <div class="machining-marks"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tool-post" id="convToolPost">
+                            <div class="tool-holder">
+                                <div class="cutting-tool" id="convCuttingTool"></div>
+                            </div>
+                        </div>
+                        <div class="coolant" id="convCoolant">
+                            <div class="coolant-stream"></div>
+                            <div class="coolant-stream"></div>
+                            <div class="coolant-stream"></div>
+                        </div>
+                        <div class="sparks" id="convSparks">
+                            <div class="spark"></div>
+                            <div class="spark"></div>
+                            <div class="spark"></div>
+                            <div class="spark"></div>
+                            <div class="spark"></div>
+                        </div>
+                        <div class="tailstock"></div>
+                        <div class="chips" id="convChips">
+                            <div class="chip"></div>
+                            <div class="chip"></div>
+                            <div class="chip"></div>
+                            <div class="chip"></div>
+                            <div class="chip"></div>
+                        </div>
+                    </div>
+
+                    <div class="stats-panel">
+                        <div class="stat-bubble" id="convVcBubble">
+                            <div class="stat-label">Vc Result.</div>
+                            <div class="stat-value" id="convVcStat">78.5</div>
+                            <div class="stat-unit">m/min</div>
+                        </div>
+                        <div class="stat-bubble" id="convMRRBubble">
+                            <div class="stat-label">MRR</div>
+                            <div class="stat-value" id="convMRRStat">0.0</div>
+                            <div class="stat-unit">cm³/min</div>
+                        </div>
+                        <div class="stat-bubble warning" id="convStatusBubble">
+                            <div class="stat-label">Estado</div>
+                            <div class="stat-value warning" id="convStatusStat">BAJO</div>
+                        </div>
+                    </div>
+
+                    <div class="alert-box alert-optimal" id="convAlertOptimal">
+                        <strong>Parámetros óptimos:</strong> La velocidad de corte está dentro del rango recomendado.
+                    </div>
+                    <div class="alert-box alert-warning" id="convAlertWarning">
+                        <strong>Advertencia:</strong> <span id="convWarningText"></span>
+                    </div>
+                    <div class="alert-box alert-danger" id="convAlertDanger">
+                        <strong>Peligro:</strong> <span id="convDangerText"></span>
+                    </div>
+
+                    <div class="status-info">
+                        <strong>RPM Fijas:</strong> La velocidad de corte (Vc) varía según el diámetro de la pieza. El operador debe ajustar manualmente las RPM cuando el diámetro cambia significativamente.
+                    </div>
+
+                    <div class="controls">
+                        <div class="control-group">
+                            <div class="control-label">
+                                <span class="label-text">Velocidad de Avance (f)</span>
+                                <span class="label-value" id="convFeedValue">0.25 mm/rev</span>
+                            </div>
+                            <input type="range" class="slider" id="convFeed" min="0.05" max="0.60" step="0.01" value="0.25" oninput="updateConv()">
+                            <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-light);">
+                                Rango recomendado: <span id="convFeedRange">0.25-0.60 mm/rev</span>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-label">
+                                <span class="label-text">Profundidad de Corte (ap)</span>
+                                <span class="label-value" id="convDepthValue">2.0 mm</span>
+                            </div>
+                            <input type="range" class="slider" id="convDepth" min="0.1" max="8.0" step="0.1" value="2.0" oninput="updateConv()">
+                            <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-light);">
+                                Rango recomendado: <span id="convDepthRange">2.0-8.0 mm</span>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-label">
+                                <span class="label-text">RPM del Husillo</span>
+                                <span class="label-value" id="convRPMValue">500 RPM</span>
+                            </div>
+                            <input type="range" class="slider" id="convRPM" min="100" max="2000" step="50" value="500" oninput="updateConv()">
+                            <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-light);">
+                                Rango típico para este diámetro: 300-1200 RPM
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REFERENCES PAGE -->
+        <div id="references" class="page">
+            <div class="card">
+                <h2 class="card-title">Referencias Bibliográficas</h2>
+                <div class="card-content">
+                    <ul class="references-list">
+                        <li>
+                            <span class="ref-number">1</span>
+                            <strong>Uneed PM.</strong> "Cortes de desbaste y acabado en operaciones de mecanizado - Torneado en Desbaste." 
+                            <a href="https://www.uneedpm.com/es/rough-turning-rough-and-finish-cuts-in-machining-operations/" target="_blank" style="color: var(--ipn-guinda);">
+                                https://www.uneedpm.com/es/rough-turning-rough-and-finish-cuts-in-machining-operations/
+                            </a>
+                        </li>
+                        <li>
+                            <span class="ref-number">2</span>
+                            <strong>Sandvik Coromant.</strong> "Turning Handbook - Technical Guides." 
+                            <a href="https://coromantstrgprod.blob.core.windows.net/files/sitecollectiondocuments%2Fdownloads%2Fglobal%2Ftechnical%20guides%2Fen-gb%2Fc-1020-18.pdf" target="_blank" style="color: var(--ipn-guinda);">
+                                Technical Guide C-1020-18
+                            </a>
+                        </li>
+                        <li>
+                            <span class="ref-number">3</span>
+                            <strong>LibreTexts Español.</strong> "Unidad 2: Velocidades, alimentaciones y roscado - Procesos de Manufactura." 
+                            <a href="https://espanol.libretexts.org/Bookshelves/Vocacional/Manufactura/Libro%3A_Procesos_de_Manufactura_4-5_(Virasak)/01%3A_Fresadoras/01.3%3A_Unidad_2" target="_blank" style="color: var(--ipn-guinda);">
+                                https://espanol.libretexts.org
+                            </a>
+                        </li>
+                        <li>
+                            <span class="ref-number">4</span>
+                            <strong>Wikipedia.</strong> "Velocidad de corte." 
+                            <a href="https://es.wikipedia.org/wiki/Velocidad_de_corte" target="_blank" style="color: var(--ipn-guinda);">
+                                https://es.wikipedia.org/wiki/Velocidad_de_corte
+                            </a>
+                        </li>
+                        <li>
+                            <span class="ref-number">5</span>
+                            <strong>Manuales de fabricantes de herramientas:</strong> Kennametal, Iscar, Mitsubishi Materials, Seco Tools. Tablas de parámetros de corte para plaquitas de carburo y cerámicas.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="developer-card">
+                <div class="developer-name">Joseph Ubaldo Trejo Hernández</div>
+                <div class="developer-title">Desarrollador del Simulador</div>
+                <div class="developer-info">
+                    <p>Instituto Politécnico Nacional</p>
+                    <p style="margin-top: 0.5rem;">Simulador Educativo de Parámetros de Corte en Torneado</p>
+                    <p style="margin-top: 0.5rem;">Desarrollado como herramienta didáctica para la enseñanza de procesos de manufactura</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Instituto Politécnico Nacional - Simulador de Torneado</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">Desarrollado por Joseph Ubaldo Trejo Hernández</p>
+    </footer>
+
+    <script>
+        // Material data with valid ranges
+// Material data - ACTUALIZADO para coincidir con página de velocidades
+        const materialDataCNC = {
+            steel: { name: 'Acero Dulce (1018/1020)', vcMin: 160, vcMax: 250, hardness: 'medium', sparks: false },
+            steel_1045: { name: 'Acero al Carbono Medio (1045)', vcMin: 140, vcMax: 220, hardness: 'medium', sparks: false },
+            lowalloy: { name: 'Acero Baja Aleación (4140/4340)', vcMin: 100, vcMax: 190, hardness: 'medium-hard', sparks: false },
+            hardened_35: { name: 'Acero Templado 35-45 HRC', vcMin: 70, vcMax: 160, hardness: 'hard', sparks: true },
+            hardened_45: { name: 'Acero Templado 45-55 HRC', vcMin: 55, vcMax: 130, hardness: 'hard', sparks: true },
+            hardened_55: { name: 'Acero Endurecido >55 HRC', vcMin: 25, vcMax: 80, hardness: 'very_hard', sparks: true },
+            stainless_303: { name: 'Acero Inoxidable 303', vcMin: 130, vcMax: 240, hardness: 'medium', sparks: false },
+            stainless: { name: 'Acero Inox. Austenítico 304/316', vcMin: 90, vcMax: 170, hardness: 'medium', sparks: false },
+            stainless_m: { name: 'Acero Inox. Martensítico 410/420', vcMin: 70, vcMax: 130, hardness: 'medium-hard', sparks: false },
+            stainless_174: { name: 'Acero Inox. 17-4PH', vcMin: 65, vcMax: 140, hardness: 'hard', sparks: false },
+            cast: { name: 'Fundición Gris GG-20/GG-25', vcMin: 70, vcMax: 140, hardness: 'medium', sparks: false },
+            nodular: { name: 'Fundición Nodular GGG-40/60', vcMin: 55, vcMax: 110, hardness: 'medium', sparks: false },
+            aluminum: { name: 'Aluminio Aleado 6061/7075', vcMin: 350, vcMax: 700, hardness: 'soft', sparks: false },
+            aluminum_2011: { name: 'Aluminio 2011', vcMin: 400, vcMax: 800, hardness: 'soft', sparks: false },
+            aluminum_pure: { name: 'Aluminio Puro 1050/1100', vcMin: 450, vcMax: 900, hardness: 'soft', sparks: false },
+            brass: { name: 'Latón C36000', vcMin: 160, vcMax: 300, hardness: 'soft', sparks: false },
+            copper: { name: 'Cobre Electrolítico C11000', vcMin: 80, vcMax: 120, hardness: 'soft', sparks: false },
+            bronze: { name: 'Bronce C93200', vcMin: 70, vcMax: 150, hardness: 'soft', sparks: false },
+            titanium: { name: 'Titanio Ti-6Al-4V (Grado 5)', vcMin: 30, vcMax: 75, hardness: 'hard', sparks: true },
+            titanium_2: { name: 'Titanio Grado 2', vcMin: 35, vcMax: 85, hardness: 'medium-hard', sparks: true },
+            inconel: { name: 'Inconel 718', vcMin: 18, vcMax: 45, hardness: 'very_hard', sparks: true },
+            hastelloy: { name: 'Hastelloy C-276', vcMin: 16, vcMax: 40, hardness: 'very_hard', sparks: true },
+            magnesium: { name: 'Magnesio AZ31/AZ91', vcMin: 500, vcMax: 1000, hardness: 'soft', sparks: false },
+            plastic: { name: 'Plásticos (varios)', vcMin: 100, vcMax: 300, hardness: 'soft', sparks: false }
+        };
+
+        const materialDataConv = {
+            steel_low: { name: 'Acero Dulce (1018/1020)', vcMin: 130, vcMax: 210, hardness: 'medium', sparks: false },
+            steel_med: { name: 'Acero al Carbono Medio (1045)', vcMin: 120, vcMax: 190, hardness: 'medium', sparks: false },
+            lowalloy: { name: 'Acero Baja Aleación (4140/4340)', vcMin: 90, vcMax: 160, hardness: 'medium-hard', sparks: false },
+            hardened_35: { name: 'Acero Templado 35-45 HRC', vcMin: 60, vcMax: 130, hardness: 'hard', sparks: true },
+            hardened_45: { name: 'Acero Templado 45-55 HRC', vcMin: 45, vcMax: 110, hardness: 'hard', sparks: true },
+            hardened_55: { name: 'Acero Endurecido >55 HRC', vcMin: 20, vcMax: 65, hardness: 'very_hard', sparks: true },
+            stainless_303: { name: 'Acero Inoxidable 303', vcMin: 110, vcMax: 200, hardness: 'medium', sparks: false },
+            stainless_a: { name: 'Acero Inox. Austenítico 304/316', vcMin: 80, vcMax: 140, hardness: 'medium', sparks: false },
+            stainless_m: { name: 'Acero Inox. Martensítico 410/420', vcMin: 60, vcMax: 110, hardness: 'medium-hard', sparks: false },
+            cast: { name: 'Fundición Gris GG-20/GG-25', vcMin: 60, vcMax: 120, hardness: 'medium', sparks: false },
+            nodular: { name: 'Fundición Nodular GGG-40/60', vcMin: 45, vcMax: 95, hardness: 'medium', sparks: false },
+            aluminum: { name: 'Aluminio Aleado 6061/7075', vcMin: 300, vcMax: 600, hardness: 'soft', sparks: false },
+            aluminum_pure: { name: 'Aluminio Puro 1050/1100', vcMin: 350, vcMax: 700, hardness: 'soft', sparks: false },
+            brass: { name: 'Latón C36000', vcMin: 140, vcMax: 250, hardness: 'soft', sparks: false },
+            bronze: { name: 'Bronce C93200', vcMin: 60, vcMax: 120, hardness: 'soft', sparks: false },
+            copper: { name: 'Cobre Electrolítico C11000', vcMin: 65, vcMax: 100, hardness: 'soft', sparks: false },
+            titanium: { name: 'Titanio Ti-6Al-4V', vcMin: 25, vcMax: 60, hardness: 'hard', sparks: true },
+            plastic: { name: 'Plásticos (varios)', vcMin: 80, vcMax: 250, hardness: 'soft', sparks: false }
+        };
+
+        let currentMode = 'desbaste';
+        let currentCNCMaterial = 'steel';
+        let currentConvMaterial = 'steel_low';
+
+        // Page navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        let lastScrollTop = 0;
+        const nav = document.querySelector("nav");
+
+        window.addEventListener("scroll", function () {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (scrollTop > lastScrollTop) {
+                nav.classList.add("hide-nav");
+            } else {
+                nav.classList.remove("hide-nav");
+            }
+
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        });
+
+        // Mode selection
+        function setMode(mode) {
+            currentMode = mode;
+            
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            const modeText = mode === 'desbaste' ? 'desbaste' : 'acabado';
+            document.querySelectorAll('#cncModeText, #cncModeText2').forEach(el => el.textContent = modeText);
+            
+            if (mode === 'desbaste') {
+                document.getElementById('cncFeedRange').textContent = '0.25-0.60 mm/rev';
+                document.getElementById('cncDepthRange').textContent = '2.0-8.0 mm';
+                document.getElementById('convFeedRange').textContent = '0.25-0.60 mm/rev';
+                document.getElementById('convDepthRange').textContent = '2.0-8.0 mm';
+                
+                document.getElementById('cncFeed').value = 0.40;
+                document.getElementById('cncDepth').value = 4.0;
+                document.getElementById('convFeed').value = 0.40;
+                document.getElementById('convDepth').value = 4.0;
+            } else {
+                document.getElementById('cncFeedRange').textContent = '0.05-0.20 mm/rev';
+                document.getElementById('cncDepthRange').textContent = '0.1-0.5 mm';
+                document.getElementById('convFeedRange').textContent = '0.05-0.20 mm/rev';
+                document.getElementById('convDepthRange').textContent = '0.1-0.5 mm';
+                
+                document.getElementById('cncFeed').value = 0.10;
+                document.getElementById('cncDepth').value = 0.3;
+                document.getElementById('convFeed').value = 0.10;
+                document.getElementById('convDepth').value = 0.3;
+            }
+            
+            updateCNC();
+            updateConv();
+        }
+
+        // Update CNC material
+        function updateCNCMaterial() {
+            currentCNCMaterial = document.getElementById('cncMaterial').value;
+            const material = materialDataCNC[currentCNCMaterial];
+            
+            const vcMiddle = (material.vcMin + material.vcMax) / 2;
+            document.getElementById('cncSpeed').min = material.vcMin;
+            document.getElementById('cncSpeed').max = material.vcMax;
+            document.getElementById('cncSpeed').value = Math.round(vcMiddle);
+            document.getElementById('cncSpeedRange').textContent = `${material.vcMin}-${material.vcMax} m/min`;
+            
+            updateCNC();
+        }
+
+        // CNC update
+        function updateCNC() {
+            let feed = parseFloat(document.getElementById('cncFeed').value);
+            let depth = parseFloat(document.getElementById('cncDepth').value);
+            let speed = parseFloat(document.getElementById('cncSpeed').value);
+            
+            const material = materialDataCNC[currentCNCMaterial];
+            const diameter = 50;
+            
+            const rpm = Math.round((1000 * speed) / (Math.PI * diameter));
+            const mrr = (speed * feed * depth / 1000).toFixed(2);
+            
+            let status = 'ÓPTIMO';
+            let statusClass = 'optimal';
+            let warnings = [];
+            let dangers = [];
+            
+            if (currentMode === 'desbaste') {
+                if (feed < 0.25) warnings.push('Avance muy bajo para desbaste');
+                if (feed > 0.60) dangers.push('Avance excesivo, riesgo de rotura');
+            } else {
+                if (feed < 0.05) warnings.push('Avance extremadamente bajo');
+                if (feed > 0.20) dangers.push('Avance muy alto para acabado');
+            }
+            
+            if (currentMode === 'desbaste') {
+                if (depth < 2.0) warnings.push('Profundidad baja para desbaste');
+                if (depth > 8.0) dangers.push('Profundidad excesiva');
+            } else {
+                if (depth > 0.5) dangers.push('Profundidad muy alta para acabado');
+            }
+            
+            if (speed < material.vcMin) {
+                warnings.push(`Vc bajo para ${material.name}`);
+            }
+            if (speed > material.vcMax) {
+                dangers.push(`Vc excesivo para ${material.name}`);
+            }
+            
+            if (dangers.length > 0) {
+                status = 'PELIGRO';
+                statusClass = 'danger';
+            } else if (warnings.length > 0) {
+                status = 'ADVERTENCIA';
+                statusClass = 'warning';
+            }
+            
+            document.getElementById('cncFeedValue').textContent = feed.toFixed(2) + ' mm/rev';
+            document.getElementById('cncDepthValue').textContent = depth.toFixed(1) + ' mm';
+            document.getElementById('cncSpeedValue').textContent = speed + ' m/min';
+            document.getElementById('cncRPMStat').textContent = rpm;
+            document.getElementById('cncMRRStat').textContent = mrr;
+            document.getElementById('cncStatusStat').textContent = status;
+            
+            const statusEl = document.getElementById('cncStatusStat');
+            const statusBubble = document.getElementById('cncStatusBubble');
+            statusEl.className = 'stat-value ' + statusClass;
+            statusBubble.className = 'stat-bubble ' + statusClass;
+            
+            document.getElementById('cncAlertOptimal').classList.toggle('show', status === 'ÓPTIMO');
+            document.getElementById('cncAlertWarning').classList.toggle('show', warnings.length > 0 && dangers.length === 0);
+            document.getElementById('cncAlertDanger').classList.toggle('show', dangers.length > 0);
+            
+            if (warnings.length > 0) {
+                document.getElementById('cncWarningText').textContent = warnings.join('. ');
+            }
+            if (dangers.length > 0) {
+                document.getElementById('cncDangerText').textContent = dangers.join('. ');
+            }
+            
+            const rotationSpeed = speed / 150;
+            const chipIntensity = feed * depth * speed / 120;
+            
+            updateVisualization('cnc', feed, depth, rotationSpeed, chipIntensity, material);
+            updateCNCScreen(speed, feed, rpm);
+        }
+
+        // Conventional update
+        function updateConv() {
+            const feed = parseFloat(document.getElementById('convFeed').value);
+            const depth = parseFloat(document.getElementById('convDepth').value);
+            const rpm = parseInt(document.getElementById('convRPM').value);
+            
+            currentConvMaterial = document.getElementById('convMaterial').value;
+            const material = materialDataConv[currentConvMaterial];
+            
+            const diameter = 50;
+            const vc = ((Math.PI * diameter * rpm) / 1000).toFixed(1);
+            const mrr = (vc * feed * depth / 1000).toFixed(2);
+            
+            let status = 'ÓPTIMO';
+            let statusClass = 'optimal';
+            let warnings = [];
+            let dangers = [];
+            
+            if (vc < material.vcMin) {
+                status = 'BAJO';
+                statusClass = 'warning';
+                warnings.push(`Vc bajo (${vc} m/min) para ${material.name}`);
+            } else if (vc > material.vcMax) {
+                status = 'ALTO';
+                statusClass = 'danger';
+                dangers.push(`Vc alto (${vc} m/min) para ${material.name}`);
+            }
+            
+            if (currentMode === 'desbaste') {
+                if (feed > 0.60) dangers.push('Avance excesivo');
+            } else {
+                if (feed > 0.20) dangers.push('Avance muy alto');
+            }
+            
+            if (currentMode === 'desbaste') {
+                if (depth > 8.0) dangers.push('Profundidad excesiva');
+            } else {
+                if (depth > 0.5) dangers.push('Profundidad alta');
+            }
+            
+            if (dangers.length > 0) {
+                status = 'PELIGRO';
+                statusClass = 'danger';
+            }
+            
+            document.getElementById('convFeedValue').textContent = feed.toFixed(2) + ' mm/rev';
+            document.getElementById('convDepthValue').textContent = depth.toFixed(1) + ' mm';
+            document.getElementById('convRPMValue').textContent = rpm + ' RPM';
+            document.getElementById('convVcStat').textContent = vc;
+            document.getElementById('convMRRStat').textContent = mrr;
+            document.getElementById('convStatusStat').textContent = status;
+            
+            const statusEl = document.getElementById('convStatusStat');
+            const statusBubble = document.getElementById('convStatusBubble');
+            statusEl.className = 'stat-value ' + statusClass;
+            statusBubble.className = 'stat-bubble ' + statusClass;
+            
+            document.getElementById('convAlertOptimal').classList.toggle('show', status === 'ÓPTIMO');
+            document.getElementById('convAlertWarning').classList.toggle('show', warnings.length > 0 && dangers.length === 0);
+            document.getElementById('convAlertDanger').classList.toggle('show', dangers.length > 0);
+            
+            if (warnings.length > 0) {
+                document.getElementById('convWarningText').textContent = warnings.join('. ');
+            }
+            if (dangers.length > 0) {
+                document.getElementById('convDangerText').textContent = dangers.join('. ');
+            }
+            
+            const rotationSpeed = rpm / 400;
+            const chipIntensity = feed * depth * rpm / 250;
+            
+            updateVisualization('conv', feed, depth, rotationSpeed, chipIntensity, material);
+            
+            const wheelLong = document.getElementById('convWheelLong');
+            const wheelTrans = document.getElementById('convWheelTrans');
+            if (chipIntensity > 12) {
+                wheelLong.classList.add('spinning');
+                wheelTrans.classList.add('spinning');
+            } else {
+                wheelLong.classList.remove('spinning');
+                wheelTrans.classList.remove('spinning');
+            }
+        }
+
+        // Update visualization
+        function updateVisualization(type, feed, depth, rotationSpeed, chipIntensity, material) {
+            const workpiece = document.getElementById(type + 'Workpiece');
+            const toolPost = document.getElementById(type + 'ToolPost');
+            const cuttingTool = document.getElementById(type + 'CuttingTool');
+            const chips = document.getElementById(type + 'Chips');
+            const coolant = document.getElementById(type + 'Coolant');
+            const sparks = document.getElementById(type + 'Sparks');
+            
+            // Rotation effect
+            if (chipIntensity > 15) {
+                workpiece.classList.add('spinning');
+                workpiece.classList.add('cutting');
+            } else {
+                workpiece.classList.remove('cutting');
+            }
+            
+            // Tool position
+            const basePosition = 48;
+            const toolPosition = basePosition + Math.min(depth * 0.8, 8);
+            toolPost.style.left = toolPosition + '%';
+            
+            // Cutting effects
+            if (chipIntensity > 18) {
+                cuttingTool.classList.add('active');
+                toolPost.classList.add('cutting');
+            } else {
+                cuttingTool.classList.remove('active');
+                toolPost.classList.remove('cutting');
+            }
+            
+            // Chips
+            const chipElements = chips.querySelectorAll('.chip');
+            const activeChips = Math.min(5, Math.floor(chipIntensity / 10) + 1);
+            
+            chipElements.forEach((chip, index) => {
+                if (index < activeChips) {
+                    chip.style.display = 'block';
+                    chip.style.animationDuration = Math.max(0.8, (1.5 / (feed * 3 + 0.5))) + 's';
+                } else {
+                    chip.style.display = 'none';
+                }
+            });
+            
+            // Coolant
+            if (material.hardness === 'hard' || material.hardness === 'very_hard' || chipIntensity > 35) {
+                coolant.classList.add('active');
+            } else {
+                coolant.classList.remove('active');
+            }
+            
+            // Sparks
+            if (material.sparks && chipIntensity > 15) {
+                sparks.classList.add('active');
+            } else {
+                sparks.classList.remove('active');
+            }
+        }
+
+        // Update CNC screen
+        function updateCNCScreen(vc, feed, rpm) {
+            const screenVc = document.getElementById('screenVc');
+            const screenFeed = document.getElementById('screenFeed');
+            const screenRPM = document.getElementById('screenRPM');
+            const screenX = document.getElementById('screenX');
+            const screenZ = document.getElementById('screenZ');
+            
+            if (screenVc) screenVc.textContent = vc;
+            if (screenFeed) screenFeed.textContent = feed.toFixed(2);
+            if (screenRPM) screenRPM.textContent = rpm;
+            if (screenX) screenX.textContent = (50 - Math.random() * 2).toFixed(1);
+            if (screenZ) screenZ.textContent = (100 - Math.random() * 5).toFixed(1);
+        }
+
+        // Material search
+        const searchInput = document.getElementById("materialSearch");
+        const materialCards = document.querySelectorAll(".material-card");
+        const noResults = document.getElementById("noResults");
+
+        function normalizeText(text) {
+            return text
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+        }
+
+        searchInput.addEventListener("input", function () {
+            const searchValue = normalizeText(this.value.trim());
+            let found = false;
+
+            materialCards.forEach(card => {
+                const dataSearch = normalizeText(card.getAttribute("data-search") || "");
+                const cardText = normalizeText(card.innerText || "");
+
+                if (dataSearch.includes(searchValue) || cardText.includes(searchValue)) {
+                    card.style.display = "block";
+                    found = true;
+                } else {
+                    card.style.display = "none";
+                }
+            });
+
+            noResults.style.display = found ? "none" : "block";
+        });
+
+        // Initialize
+        window.addEventListener('load', function() {
+            updateCNC();
+            updateConv();
+        });
+    </script>
+</body>
+</html>
