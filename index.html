@@ -437,822 +437,1518 @@
             50% { transform: scale(1.05); }
         }
 
-/* Lathe Canvas - Vista Lateral Mejorada */
+/* ================================================
+   LATHE CANVAS — FRONT VIEW
+   ================================================ */
+
+/* ================================================
+   LATHE CANVAS — EPIC FRONT VIEW v2.0
+   ================================================ */
+
 .lathe-canvas {
-    width: 100%;
-    height: 450px;
-    background: 
-        radial-gradient(ellipse at 30% 40%, rgba(109, 31, 65, 0.03) 0%, transparent 50%),
-        linear-gradient(180deg, #e8e4d9 0%, #d4cfc4 100%);
-    border: 3px solid var(--ipn-guinda);
-    border-radius: 8px;
+    width:100%; height:420px;
+    background: linear-gradient(180deg,#04080f 0%,#080e18 40%,#060b14 70%,#030608 100%);
+    border: 2px solid var(--ipn-guinda);
+    border-radius: 10px;
     margin: 1.5rem 0;
     position: relative;
     overflow: hidden;
-    box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow:
+        inset 0 0 80px rgba(0,0,0,.8),
+        0 0 0 1px rgba(109,31,65,.3),
+        0 8px 40px rgba(0,0,0,.6);
+    --lc-bed:68px; --lc-spindle:168px; --lc-wp-h:58px; --lc-wp-r:29px; --lc-chuck-r:41px;
 }
 
-/* Machine base */
-.machine-base {
+/* === CANVAS OVERLAY para partículas JS === */
+.lc-particle-canvas {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 70px;
-    background: linear-gradient(180deg, #555 0%, #333 50%, #222 100%);
-    border-top: 4px solid #888;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.4);
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
 }
 
-.machine-base::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, transparent 0%, #aaa 20%, #aaa 80%, transparent 100%);
+/* === AMBIENT ATMOSPHERE === */
+.lc-ambient {
+    position: absolute; inset: 0;
+    pointer-events: none; z-index: 30;
+    transition: all .6s ease;
+}
+.lc-ambient.cutting {
+    background:
+        radial-gradient(ellipse at 58% 44%, rgba(255,130,20,.06) 0%, transparent 55%),
+        radial-gradient(ellipse at 20% 60%, rgba(60,80,200,.04) 0%, transparent 40%);
+}
+.lc-ambient.hot {
+    background:
+        radial-gradient(ellipse at 58% 44%, rgba(255,50,0,.14) 0%, transparent 50%),
+        radial-gradient(ellipse at 58% 44%, rgba(255,150,0,.06) 0%, transparent 70%);
+    animation: lcAmbientPulse 1.2s ease-in-out infinite;
+}
+@keyframes lcAmbientPulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: .75; }
 }
 
-/* Headstock - Lado izquierdo */
-.headstock {
-    position: absolute;
-    left: 8%;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 100px;
-    height: 160px;
-    background: linear-gradient(135deg, #666 0%, #444 50%, #333 100%);
-    border-radius: 10px;
-    border: 3px solid #777;
-    box-shadow: 
-        inset 0 2px 10px rgba(0,0,0,0.4),
-        0 8px 20px rgba(0,0,0,0.3);
-}
-
-.headstock::after {
-    content: 'HEADSTOCK';
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.5rem;
-    color: #999;
-    font-weight: 700;
-    letter-spacing: 1px;
-}
-
-/* Chuck - Mejorado */
-.chuck {
-    position: absolute;
-    right: -30px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 70px;
-    height: 70px;
-    background: radial-gradient(circle, #888 0%, #555 50%, #333 100%);
-    border-radius: 50%;
-    border: 4px solid #666;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-}
-
-.chuck::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 25px;
-    height: 25px;
-    background: #444;
-    border-radius: 50%;
-    border: 2px solid #555;
-}
-
-.chuck-jaw {
-    position: absolute;
-    width: 85%;
-    height: 4px;
-    background: linear-gradient(90deg, transparent 0%, #222 20%, #222 80%, transparent 100%);
-    top: 50%;
-    left: 7.5%;
-    transform: translateY(-50%);
-}
-
-.chuck-jaw:nth-child(2) {
-    transform: translateY(-50%) rotate(90deg);
-}
-
-/* Workpiece - Vista Lateral Realista */
-.workpiece {
-    position: absolute;
-    left: 20%;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 280px;
-    height: 65px;
-    z-index: 10;
-}
-
-.workpiece-outer {
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-
-/* Cilindro con efecto de rotación mediante líneas */
-.cylinder {
-    width: 100%;
-    height: 100%;
-    background: 
-        linear-gradient(180deg,
-            #9eaeb0 0%,
-            #b8c8ca 15%,
-            #d8e8ea 30%,
-            #f0fafa 50%,
-            #d8e8ea 70%,
-            #b8c8ca 85%,
-            #8e9ea0 100%
-        );
-    border-radius: 4px;
-    position: relative;
-    box-shadow: 
-        inset 0 -15px 20px rgba(0,0,0,0.2),
-        inset 0 15px 20px rgba(255,255,255,0.3),
-        0 5px 20px rgba(0,0,0,0.3);
-}
-
-/* Líneas de velocidad para simular rotación */
-.cylinder::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(
-        90deg,
-        transparent 0px,
-        rgba(0,0,0,0.08) 1px,
-        transparent 2px,
-        transparent 8px
-    );
-    border-radius: 4px;
+/* === FLOOR REFLECTION === */
+.lc-floor-reflect {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 68px; z-index: 1;
+    background: linear-gradient(0deg,
+        rgba(255,100,20,.03) 0%,
+        transparent 100%);
+    pointer-events: none;
+    transition: opacity .5s;
     opacity: 0;
-    transition: opacity 0.3s;
 }
+.lc-floor-reflect.active { opacity: 1; }
 
-.workpiece.spinning .cylinder::before {
-    opacity: 1;
-    animation: speedLines 0.8s linear infinite;
-}
-
-@keyframes speedLines {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(8px); }
-}
-
-/* Brillo superior del cilindro */
-.cylinder::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 35%;
-    background: linear-gradient(180deg, 
-        rgba(255,255,255,0.5) 0%, 
-        rgba(255,255,255,0.2) 40%,
-        transparent 100%
+/* === HEAT SHIMMER OVERLAY === */
+.lc-heat-shimmer {
+    position: absolute; inset: 0;
+    pointer-events: none; z-index: 29;
+    opacity: 0; transition: opacity .8s;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(255,80,0,.015) 3px,
+        rgba(255,80,0,.015) 4px
     );
+    animation: lcHeatShimmer 0.08s steps(1) infinite paused;
+}
+.lc-heat-shimmer.active {
+    opacity: 1;
+    animation-play-state: running;
+}
+@keyframes lcHeatShimmer {
+    0%   { transform: translateY(0) skewX(0deg); }
+    25%  { transform: translateY(-0.5px) skewX(0.15deg); }
+    50%  { transform: translateY(0.3px) skewX(-0.1deg); }
+    75%  { transform: translateY(-0.2px) skewX(0.08deg); }
+    100% { transform: translateY(0.4px) skewX(-0.12deg); }
+}
+
+/* === BED === */
+.lc-bed {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: var(--lc-bed);
+    background: linear-gradient(180deg,
+        #2e3540 0%, #242a34 30%, #1c2028 70%, #141820 100%);
+    border-top: 2px solid #3e4550;
+    box-shadow: inset 0 8px 20px rgba(0,0,0,.6);
+    z-index: 2;
+}
+.lc-bed::before {
+    content:'';
+    position: absolute; top: 8px; left: 5%; right: 5%;
+    height: 8px;
+    background: linear-gradient(180deg, #4a5060 0%, #363c48 100%);
+    border-radius: 2px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.4);
+}
+.lc-bed::after {
+    content:'';
+    position: absolute; top: 20px; left: 5%; right: 5%;
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent 0%, #5a6070 10%, #5a6070 90%, transparent 100%);
+    border-radius: 1px;
+}
+/* Bed way reflections */
+.lc-bed-ways {
+    position: absolute; top: 26px; left: 10%; right: 10%; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(150,170,200,.12), transparent);
+    animation: lcBedWaySheen 4s ease-in-out infinite;
+}
+@keyframes lcBedWaySheen {
+    0%,100% { opacity: .4; transform: scaleX(.8); }
+    50%      { opacity: 1; transform: scaleX(1); }
+}
+
+/* === HEADSTOCK === */
+.lc-headstock {
+    position: absolute; left: 0; width: 13.5%;
+    top: 30px; bottom: var(--lc-bed);
+    background: linear-gradient(155deg,
+        #454b58 0%, #353c4c 40%, #282e3c 75%, #1e2430 100%);
+    border-right: 3px solid #52596a;
+    border-top: 2px solid #4a5060;
+    border-radius: 0 8px 0 0;
+    box-shadow:
+        6px 0 24px rgba(0,0,0,.6),
+        inset 0 2px 10px rgba(255,255,255,.03),
+        inset 2px 0 8px rgba(0,0,0,.3);
+    z-index: 6;
+}
+.lc-headstock::before {
+    content:'';
+    position: absolute; top: -20px; left: 10%; right: 10%;
+    height: 22px;
+    background: linear-gradient(180deg, #303840 0%, #262c38 100%);
+    border: 2px solid #424858; border-bottom: none;
     border-radius: 4px 4px 0 0;
 }
-
-/* Marcas de mecanizado */
-.machining-marks {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(
-        90deg,
-        transparent 0px,
-        rgba(0,0,0,0.03) 1px,
-        transparent 2px,
-        transparent 12px
-    );
+.lc-headstock::after {
+    content:'HEADSTOCK';
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    font-size: .36rem; color: #606888; font-weight: 800;
+    letter-spacing: 1.5px; white-space: nowrap;
+    text-shadow: 0 0 8px rgba(100,120,200,.3);
+}
+/* Headstock power LED strip */
+.lc-hs-led-strip {
+    position: absolute; bottom: 20px; left: 8px; right: 8px;
+    height: 3px; border-radius: 2px;
+    background: #1a1e28;
+    overflow: hidden;
+}
+.lc-hs-led-strip::after {
+    content:'';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent 0%, #4CAF50 50%, transparent 100%);
     opacity: 0;
-    transition: opacity 0.5s;
+    transition: opacity .4s;
+    animation: lcLedScan 2s linear infinite paused;
 }
-
-.workpiece.cutting .machining-marks {
+.lc-hs-led-strip.active::after {
     opacity: 1;
+    animation-play-state: running;
+}
+@keyframes lcLedScan {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(200%); }
 }
 
-/* Tool post - Posicionado arriba */
-.tool-post {
+/* === SPINDLE NOSE === */
+.lc-spindle-nose {
+    position: absolute; left: 13.5%; width: 20px; height: 32px;
+    top: calc(var(--lc-spindle) - 16px);
+    background: linear-gradient(90deg, #686e7a 0%, #4c5260 60%, #3a3f4e 100%);
+    border: 1px solid #787e88;
+    border-radius: 0 4px 4px 0;
+    z-index: 7;
+    box-shadow: 3px 0 10px rgba(0,0,0,.5);
+}
+.lc-spindle-nose::after {
+    content:'';
+    position: absolute; top: 4px; left: 6px; right: 4px; bottom: 4px;
+    background: repeating-linear-gradient(0deg,
+        transparent 0, transparent 3px,
+        rgba(255,255,255,.04) 3px, rgba(255,255,255,.04) 4px);
+    border-radius: 2px;
+}
+
+/* === CHUCK === */
+.lc-chuck {
+    position: absolute; left: 14%;
+    top: calc(var(--lc-spindle) - var(--lc-chuck-r));
+    width: calc(var(--lc-chuck-r)*2);
+    height: calc(var(--lc-chuck-r)*2);
+    z-index: 10;
+    transform-origin: center center;
+}
+.lc-chuck.spinning {
+    animation: lcChuckSpin .8s linear infinite;
+}
+@keyframes lcChuckSpin { to { transform: rotate(360deg); } }
+
+.lc-chuck-body {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%,
+        #8a9098 0%, #606878 25%, #404858 60%, #282e3c 85%, #181e2a 100%);
+    border: 3px solid #5a6278;
+    box-shadow:
+        4px 8px 24px rgba(0,0,0,.7),
+        inset 0 2px 10px rgba(255,255,255,.07),
+        inset 0 -3px 8px rgba(0,0,0,.5);
+    position: relative; overflow: hidden;
+}
+/* Chuck metallic ring */
+.lc-chuck-body::before {
+    content:'';
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 88%; height: 88%;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.06);
+    box-shadow: inset 0 0 20px rgba(0,0,0,.4);
+}
+/* Chuck scroll grooves */
+.lc-chuck-body::after {
+    content:'';
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 55%; height: 55%;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.05);
+}
+.lc-chuck-hub {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 22px; height: 22px; border-radius: 50%;
+    background: radial-gradient(circle, #3a4050 0%, #1e2230 100%);
+    border: 2px solid #484e60;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,.7), 0 0 8px rgba(0,0,0,.5);
+    z-index: 2;
+}
+.lc-jaw {
     position: absolute;
-    left: 48%;
-    top: 25%;
-    width: 70px;
-    height: 90px;
-    background: linear-gradient(135deg, #666 0%, #444 50%, #333 100%);
-    border: 3px solid #777;
-    border-radius: 6px;
-    transition: left 0.5s ease, top 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-    z-index: 15;
+    width: 12px; height: 22px;
+    background: linear-gradient(180deg, #8a9098 0%, #646c78 45%, #484e5c 100%);
+    border: 1px solid #9aa0a8;
+    border-radius: 4px 4px 1px 1px;
+    top: calc(50% - 22px); left: calc(50% - 6px);
+    transform-origin: 6px 22px;
+    box-shadow: 0 3px 8px rgba(0,0,0,.6), inset 0 1px 3px rgba(255,255,255,.1);
 }
-
-.tool-post.cutting {
-    box-shadow: 0 6px 20px rgba(109, 31, 65, 0.5);
-    top: 28%;
-}
-
-.tool-holder {
-    position: absolute;
-    bottom: -25px;
-    left: 50%;
+.lc-jaw::after {
+    content:'';
+    position: absolute; top: 5px; left: 50%;
     transform: translateX(-50%);
-    width: 45px;
-    height: 55px;
-    background: linear-gradient(135deg, #7a8a8b 0%, #5a6a6b 100%);
-    border: 2px solid #666;
+    width: 4px; height: 13px;
+    background: rgba(0,0,0,.25); border-radius: 1px;
+}
+.lc-jaw-1 { transform: rotate(0deg); }
+.lc-jaw-2 { transform: rotate(120deg); }
+.lc-jaw-3 { transform: rotate(240deg); }
+
+/* === WORKPIECE === */
+.lc-workpiece {
+    position: absolute; left: 20%; right: 22%;
+    top: calc(var(--lc-spindle) - var(--lc-wp-r));
+    height: var(--lc-wp-h);
+    z-index: 8;
+    transition: top .3s ease;
+}
+.lc-wp-body {
+    width: 100%; height: 100%;
+    border-radius: 0 5px 5px 0;
+    background: linear-gradient(180deg,
+        #6a7e82 0%,
+        #9ab8bc 6%,
+        #c8dde0 18%,
+        #e8f8fa 50%,
+        #c8dde0 82%,
+        #9ab8bc 94%,
+        #6a7e82 100%);
+    box-shadow:
+        0 4px 20px rgba(0,0,0,.6),
+        inset 0 1px 4px rgba(255,255,255,.2),
+        inset 0 -2px 4px rgba(0,0,0,.3);
+    position: relative; overflow: hidden;
+}
+/* Top/bottom shadow bands */
+.lc-wp-body::before {
+    content:''; position: absolute;
+    top: 0; left: 0; right: 0; height: 7px;
+    background: linear-gradient(180deg, rgba(0,0,0,.45) 0%, transparent 100%);
+}
+.lc-wp-body::after {
+    content:''; position: absolute;
+    bottom: 0; left: 0; right: 0; height: 7px;
+    background: linear-gradient(0deg, rgba(0,0,0,.45) 0%, transparent 100%);
+}
+
+/* Rotation lines */
+.lc-wp-lines {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(90deg,
+        transparent 0,
+        rgba(180,210,218,.16) .5px,
+        transparent 1px,
+        transparent 9px);
+    opacity: 0; pointer-events: none;
+    animation: lcWpSpin .5s linear infinite paused;
+    transition: opacity .3s;
+}
+@keyframes lcWpSpin {
+    from { transform: translateX(0); }
+    to   { transform: translateX(9px); }
+}
+.lc-workpiece.spinning .lc-wp-lines {
+    opacity: 1; animation-play-state: running;
+}
+
+/* Motion blur overlay while spinning fast */
+.lc-wp-blur {
+    position: absolute; inset: 0;
+    pointer-events: none; opacity: 0;
+    transition: opacity .3s;
+    background: linear-gradient(180deg,
+        transparent 10%,
+        rgba(200,220,225,.06) 50%,
+        transparent 90%);
+}
+.lc-workpiece.spinning .lc-wp-blur { opacity: 1; }
+
+/* Heat glow */
+.lc-wp-heat {
+    position: absolute; right: 0; width: 50%;
+    top: 0; bottom: 0; opacity: 0;
+    transition: opacity .5s, background .6s;
+    pointer-events: none;
+    border-radius: 0 5px 5px 0;
+}
+.lc-wp-heat.warm {
+    opacity: 1;
+    background: radial-gradient(ellipse at right center,
+        rgba(255,180,60,.18) 0%, rgba(255,120,30,.08) 40%, transparent 70%);
+    animation: lcHeatPulse 1.5s ease-in-out infinite;
+}
+.lc-wp-heat.hot {
+    opacity: 1;
+    background: radial-gradient(ellipse at right center,
+        rgba(255,60,0,.35) 0%, rgba(255,120,0,.18) 30%, rgba(255,180,0,.06) 60%, transparent 80%);
+    animation: lcHeatPulse .7s ease-in-out infinite;
+}
+@keyframes lcHeatPulse {
+    0%,100% { opacity: 1; transform: scaleX(1); }
+    50%     { opacity: .75; transform: scaleX(1.05); }
+}
+
+/* Machined section */
+.lc-wp-machined {
+    position: absolute; right: 0; width: 42%;
+    top: 6px; bottom: 6px;
+    background: linear-gradient(180deg,
+        #58706e 0%, #7a9290 10%, #a0b8b8 25%, #b8ccce 50%, #a0b8b8 75%, #7a9290 90%, #58706e 100%);
+    border-radius: 0 4px 4px 0;
+    opacity: 0; transition: opacity .5s, top .3s, bottom .3s;
+}
+.lc-wp-machined::after {
+    content:'';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(90deg,
+        transparent 0, rgba(0,0,0,.03) .5px, transparent 1px, transparent 6px);
+    border-radius: inherit;
+}
+.lc-wp-machined.active { opacity: 1; }
+
+.lc-wp-shoulder {
+    position: absolute; right: 42%; width: 3px;
+    top: 0; bottom: 0;
+    background: linear-gradient(90deg, #4a6062 0%, #7a9898 50%, #4a6062 100%);
+    opacity: 0; transition: opacity .4s; z-index: 1;
+}
+.lc-wp-shoulder.active { opacity: 1; }
+
+/* === CARRIAGE === */
+.lc-carriage {
+    position: absolute; left: 56%; bottom: var(--lc-bed);
+    width: 88px; height: 60px;
+    background: linear-gradient(155deg,
+        #424858 0%, #323848 55%, #262c3a 100%);
+    border: 2px solid #505868;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    box-shadow:
+        0 -4px 16px rgba(0,0,0,.5),
+        inset 0 1px 4px rgba(255,255,255,.04);
+    z-index: 12;
+    transition: left .4s ease;
+}
+.lc-carriage.cutting {
+    animation: lcCarriageFeed 7s cubic-bezier(.4,0,.2,1) infinite;
+}
+@keyframes lcCarriageFeed {
+    0%,4%   { left: 56%; }
+    46%,54% { left: 43%; }
+    96%,100%{ left: 56%; }
+}
+
+/* Carriage detail lines */
+.lc-carriage::before {
+    content:'';
+    position: absolute; top: 8px; left: 6px; right: 6px; height: 1px;
+    background: rgba(255,255,255,.06);
+}
+.lc-carriage::after {
+    content:'';
+    position: absolute; top: 12px; left: 6px; right: 6px; height: 1px;
+    background: rgba(0,0,0,.3);
+}
+
+/* === CNC TURRET === */
+.lc-turret {
+    position: absolute; top: 5px; left: 50%;
+    transform: translateX(-50%);
+    width: 56px; height: 44px;
+    background: linear-gradient(155deg, #505868 0%, #3a4050 100%);
+    border: 2px solid #626878;
     border-radius: 4px;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 14px rgba(0,0,0,.5), inset 0 1px 3px rgba(255,255,255,.06);
+}
+.lc-turret::before {
+    content:'';
+    position: absolute; inset: 4px;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 2px;
+}
+.lc-turret::after {
+    content:'T01';
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: .5rem; color: #7ab8cc;
+    font-weight: 800; font-family: monospace;
+    text-shadow: 0 0 6px rgba(100,180,200,.6);
+    letter-spacing: 1px;
+}
+.lc-turret-led {
+    position: absolute; top: 6px; right: 7px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #1a2030;
+    border: 1px solid #404858;
+    transition: background .3s, box-shadow .3s;
+}
+.lc-turret-led.active {
+    background: #4CAF50;
+    box-shadow: 0 0 6px #4CAF50, 0 0 14px rgba(76,175,80,.5);
+    animation: lcLedBlink .8s ease-in-out infinite;
+}
+@keyframes lcLedBlink {
+    0%,100% { box-shadow: 0 0 6px #4CAF50, 0 0 14px rgba(76,175,80,.5); }
+    50%     { box-shadow: 0 0 3px #4CAF50, 0 0 8px rgba(76,175,80,.3); }
 }
 
-/* Herramienta de corte apuntando hacia abajo */
-.cutting-tool {
-    position: absolute;
-    bottom: -18px;
-    left: 50%;
+/* === 4-WAY TOOL POST (CONVENTIONAL) === */
+.lc-tool-post-conv {
+    position: absolute; top: 5px; left: 50%;
     transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-top: 24px solid var(--ipn-guinda);
-    filter: drop-shadow(0 0 10px rgba(109, 31, 65, 0.7));
-    transition: filter 0.3s ease;
+    width: 36px; height: 30px;
+    background: linear-gradient(155deg, #545e6c 0%, #3e4858 100%);
+    border: 2px solid #646e7c;
+    border-radius: 3px;
+    box-shadow: 0 3px 10px rgba(0,0,0,.5);
+}
+.lc-tool-post-conv::after {
+    content: 'T1';
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: .44rem; color: #aab4c0; font-weight: 700;
 }
 
-.cutting-tool.active {
-    filter: drop-shadow(0 0 15px rgba(109, 31, 65, 1)) drop-shadow(0 0 25px rgba(255, 107, 53, 0.5));
+/* === APRON (CONVENTIONAL) === */
+.lc-apron {
+    position: absolute; left: -2px; bottom: 0;
+    width: 26px; height: 100%;
+    background: linear-gradient(90deg, #3c4454 0%, #303848 100%);
+    border-left: 1px solid #4c5468;
+    border-radius: 2px 0 0 0;
+}
+.lc-feed-lever {
+    position: absolute; top: 8px; left: 50%;
+    transform: translateX(-50%);
+    width: 7px; height: 26px;
+    background: linear-gradient(180deg, #6a7080 0%, #484e5c 100%);
+    border-radius: 4px 4px 1px 1px;
+    transform-origin: bottom center;
+    transition: transform .5s cubic-bezier(.3,1.5,.4,1);
+    box-shadow: 0 2px 6px rgba(0,0,0,.5);
+}
+.lc-feed-lever::before {
+    content:'';
+    position: absolute; top: -4px; left: 50%;
+    transform: translateX(-50%);
+    width: 14px; height: 8px;
+    background: radial-gradient(circle, #8a9098 0%, #585e68 100%);
+    border-radius: 50%; border: 1px solid #6a7078;
+    box-shadow: 0 1px 4px rgba(0,0,0,.4);
+}
+.lc-feed-lever.engaged {
+    transform: translateX(-50%) rotate(-32deg);
 }
 
-/* Tailstock */
-.tailstock {
-    position: absolute;
-    right: 12%;
-    top: 50%;
+/* === TOOL ASSEMBLY === */
+.lc-tool-assembly {
+    position: absolute; left: 57%;
+    top: calc(var(--lc-spindle) + var(--lc-wp-r));
+    display: flex; flex-direction: column;
+    align-items: center; z-index: 15;
+    transition: top .25s cubic-bezier(.2,.8,.3,1);
+    filter: drop-shadow(0 0 0 transparent);
+    transition: top .25s cubic-bezier(.2,.8,.3,1), filter .3s;
+}
+.lc-tool-assembly.cutting {
+    animation: lcToolAsmFeed 7s cubic-bezier(.4,0,.2,1) infinite;
+    filter: drop-shadow(0 0 8px rgba(255,140,0,.2));
+}
+@keyframes lcToolAsmFeed {
+    0%,4%   { left: 57%; }
+    46%,54% { left: 44%; }
+    96%,100%{ left: 57%; }
+}
+
+/* === INSERT (CUTTING TIP) === */
+.lc-insert {
+    position: relative;
+    width: 0; height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 18px solid #c8a020;
+    filter: drop-shadow(0 0 4px rgba(200,160,30,.4));
+    transition: filter .3s, border-bottom-color .3s;
+    flex-shrink: 0;
+}
+.lc-insert.active {
+    border-bottom-color: #ff7722;
+    filter:
+        drop-shadow(0 0 8px rgba(255,119,34,.9))
+        drop-shadow(0 0 20px rgba(255,80,10,.6))
+        drop-shadow(0 0 40px rgba(255,60,0,.3));
+    animation: lcInsertVibrate .065s ease-in-out infinite,
+               lcInsertGlowPulse .3s ease-in-out infinite;
+}
+@keyframes lcInsertVibrate {
+    0%  { transform: translateY(0) translateX(0) rotate(0deg); }
+    20% { transform: translateY(-.6px) translateX(-.5px) rotate(.15deg); }
+    40% { transform: translateY(.5px) translateX(.4px) rotate(-.1deg); }
+    60% { transform: translateY(-.4px) translateX(.3px) rotate(.12deg); }
+    80% { transform: translateY(.3px) translateX(-.4px) rotate(-.08deg); }
+}
+@keyframes lcInsertGlowPulse {
+    0%,100% { filter: drop-shadow(0 0 8px rgba(255,119,34,.9)) drop-shadow(0 0 20px rgba(255,80,10,.6)); }
+    50%     { filter: drop-shadow(0 0 12px rgba(255,160,40,1)) drop-shadow(0 0 30px rgba(255,100,10,.8)); }
+}
+
+.lc-insert-arm {
+    width: 9px; flex: 1; min-height: 24px;
+    background: linear-gradient(90deg, #6a7080 0%, #4e5568 100%);
+    border-radius: 0 0 3px 3px;
+    box-shadow: 1px 2px 6px rgba(0,0,0,.4);
+}
+
+/* === CHIP SYSTEM - CSS Chips === */
+.lc-chips {
+    position: absolute; width: 90px; height: 90px;
+    top: -55px; left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none; z-index: 20;
+    overflow: visible;
+}
+.lc-chip {
+    position: absolute; top: 12px; left: 50%;
+    opacity: 0; border-radius: 2px;
+    transform-origin: center center;
+}
+.lc-chip-c {
+    width: 14px; height: 6px;
+    background: linear-gradient(90deg, #6a7a50 0%, #9aaa60 50%, #6a7a50 100%);
+    border-radius: 40% 40% 0 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+.lc-chip-l {
+    width: 20px; height: 3px;
+    background: linear-gradient(90deg, #707878 0%, #9aA8a8 50%, #707878 100%);
+    border-radius: 2px;
+}
+.lc-chip-s {
+    width: 8px; height: 8px;
+    background: radial-gradient(circle, #909090 0%, #606060 100%);
+    border-radius: 50%;
+}
+
+@keyframes lcChipArc {
+    0%   { transform: translate(0,0) rotate(0deg) scale(1.2); opacity: .95; }
+    20%  { opacity: 1; }
+    100% { transform: translate(var(--cx),var(--cy)) rotate(var(--cr,400deg)) scale(.2); opacity: 0; }
+}
+.lc-chip:nth-child(1) { --cx:-34px; --cy:-48px; --cr:360deg;  animation: lcChipArc 1s ease-out infinite; animation-delay: 0s; }
+.lc-chip:nth-child(2) { --cx:-16px; --cy:-62px; --cr:-320deg; animation: lcChipArc 1s ease-out infinite; animation-delay:.2s; }
+.lc-chip:nth-child(3) { --cx:-48px; --cy:-38px; --cr:380deg;  animation: lcChipArc 1s ease-out infinite; animation-delay:.4s; }
+.lc-chip:nth-child(4) { --cx:-8px;  --cy:-70px; --cr:-300deg; animation: lcChipArc 1s ease-out infinite; animation-delay:.6s; }
+.lc-chip:nth-child(5) { --cx:-58px; --cy:-28px; --cr:340deg;  animation: lcChipArc 1s ease-out infinite; animation-delay:.8s; }
+.lc-chip.paused { animation-play-state: paused !important; opacity: 0 !important; }
+
+/* === PLASMA ARC (contact point glow) === */
+.lc-plasma {
+    position: absolute; top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 20px; height: 8px;
+    pointer-events: none; z-index: 22;
+    opacity: 0; transition: opacity .2s;
+}
+.lc-plasma.active { opacity: 1; }
+.lc-plasma-core {
+    position: absolute; top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 8px; height: 8px; border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, #ffee80 30%, #ff8800 65%, transparent 100%);
+    box-shadow:
+        0 0 6px #ffcc00,
+        0 0 14px #ff8800,
+        0 0 28px rgba(255,80,0,.6),
+        0 0 50px rgba(255,40,0,.3);
+    animation: lcPlasmaPulse .12s ease-in-out infinite paused;
+}
+.lc-plasma.active .lc-plasma-core {
+    animation-play-state: running;
+}
+@keyframes lcPlasmaPulse {
+    0%,100% { transform: translateX(-50%) scale(1); opacity: 1; }
+    50%     { transform: translateX(-50%) scale(1.4); opacity: .85; }
+}
+
+/* === COOLANT === */
+.lc-coolant-nozzle {
+    position: absolute; top: -72px; left: 58%;
+    width: 16px; height: 18px;
+    background: linear-gradient(155deg, #5a6270 0%, #404855 100%);
+    border: 1px solid #6a7280;
+    border-radius: 2px 2px 0 8px;
+    z-index: 17; opacity: 0; transition: opacity .4s;
+    box-shadow: 0 2px 6px rgba(0,0,0,.4);
+}
+.lc-coolant-nozzle.active { opacity: 1; }
+.lc-coolant-nozzle::after {
+    content:'';
+    position: absolute; bottom: -6px; left: 4px;
+    width: 6px; height: 8px;
+    background: linear-gradient(180deg, #5a6270 0%, transparent 100%);
+}
+
+.lc-coolant {
+    position: absolute; top: -58px; left: 60%;
+    width: 18px; height: 60px;
+    opacity: 0; transition: opacity .5s;
+    pointer-events: none; z-index: 18;
+    transform: rotate(8deg);
+    filter: blur(.5px);
+}
+.lc-coolant.active { opacity: .85; }
+.lc-coolant-jet {
+    position: absolute; width: 3px; height: 100%;
+    background: linear-gradient(180deg,
+        rgba(140,220,255,.9) 0%,
+        rgba(80,180,255,.6) 40%,
+        rgba(40,130,255,.2) 80%,
+        transparent 100%);
+    border-radius: 2px;
+    animation: lcCoolantFlow .35s linear infinite;
+}
+.lc-coolant-jet:nth-child(1) { left: 2px; animation-delay: 0s; }
+.lc-coolant-jet:nth-child(2) { left: 10px; animation-delay: .17s; }
+@keyframes lcCoolantFlow {
+    0%   { transform: translateY(-10px) scaleY(.75); opacity: .4; }
+    50%  { opacity: 1; }
+    100% { transform: translateY(12px) scaleY(1.2); opacity: .1; }
+}
+/* Coolant splash at bottom */
+.lc-coolant-splash {
+    position: absolute; bottom: -8px; left: -6px; right: -6px; height: 6px;
+    opacity: 0; transition: opacity .3s;
+}
+.lc-coolant.active .lc-coolant-splash { opacity: 1; }
+.lc-coolant-splash::before {
+    content:'';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+    background: radial-gradient(ellipse at 50% 100%, rgba(100,180,255,.4) 0%, transparent 70%);
+    animation: lcSplash .4s ease-in-out infinite;
+}
+@keyframes lcSplash {
+    0%,100% { transform: scaleX(.8); opacity: .5; }
+    50%     { transform: scaleX(1.2); opacity: 1; }
+}
+
+/* === SPARKS === */
+.lc-sparks {
+    position: absolute; width: 60px; height: 60px;
+    top: -60px; left: 50%;
+    transform: translateX(-50%);
+    opacity: 0; transition: opacity .2s;
+    pointer-events: none; z-index: 21;
+}
+.lc-sparks.active { opacity: 1; }
+.lc-spark {
+    position: absolute; top: 44px; left: 50%;
+    width: 3px; height: 3px; border-radius: 50%;
+    background: #ffe866;
+    box-shadow: 0 0 5px #ffdd22, 0 0 10px #ff9900, 0 0 18px rgba(255,100,0,.5);
+    opacity: 0;
+    animation: lcSparkFly .38s ease-out infinite;
+}
+.lc-spark:nth-child(1) { animation-delay: 0s;    --sx:-28px; --sy:-34px; }
+.lc-spark:nth-child(2) { animation-delay: .06s;  --sx: 12px; --sy:-40px; }
+.lc-spark:nth-child(3) { animation-delay: .12s;  --sx:-40px; --sy:-22px; }
+.lc-spark:nth-child(4) { animation-delay: .19s;  --sx: 22px; --sy:-30px; }
+.lc-spark:nth-child(5) { animation-delay: .26s;  --sx:-14px; --sy:-46px; }
+.lc-spark:nth-child(6) { animation-delay: .32s;  --sx: 32px; --sy:-18px; }
+@keyframes lcSparkFly {
+    0%   { transform: translate(0,0) scale(1.5); opacity: 1; }
+    60%  { opacity: .8; }
+    100% { transform: translate(var(--sx),var(--sy)) scale(0); opacity: 0; }
+}
+
+/* === TAILSTOCK === */
+.lc-tailstock {
+    position: absolute; right: 2%; width: 10%;
+    top: 50px; bottom: var(--lc-bed);
+    background: linear-gradient(150deg, #424750 0%, #323840 55%, #262c38 100%);
+    border-radius: 6px 6px 0 0;
+    border: 2px solid #505560; border-bottom: none;
+    box-shadow: -4px 0 18px rgba(0,0,0,.5);
+    z-index: 6;
+}
+.lc-tailstock::before {
+    content:'TAILSTOCK';
+    position: absolute; top: 9px; left: 50%;
+    transform: translateX(-50%);
+    font-size: .36rem; color: #606880; font-weight: 800;
+    letter-spacing: .8px; white-space: nowrap;
+}
+.lc-ts-quill {
+    position: absolute; left: -24px; top: 50%;
     transform: translateY(-50%);
-    width: 80px;
-    height: 130px;
-    background: linear-gradient(135deg, #666 0%, #444 50%, #333 100%);
-    border-radius: 8px;
-    border: 3px solid #777;
-    box-shadow: 
-        inset 0 2px 10px rgba(0,0,0,0.3),
-        0 6px 20px rgba(0,0,0,0.3);
+    width: 28px; height: 13px;
+    background: linear-gradient(90deg, #8a8f9a 0%, #686d7a 100%);
+    border-radius: 0 3px 3px 0;
+    box-shadow: -1px 0 8px rgba(0,0,0,.5);
+}
+.lc-ts-quill::after {
+    content:''; position: absolute;
+    right: -7px; top: 50%;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 8px solid #686d7a;
+}
+.lc-ts-hw {
+    position: absolute; right: -15px; top: 62%;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: radial-gradient(circle at 36% 34%, #565b66 0%, #323840 100%);
+    border: 2px solid #484e5a;
+    box-shadow: 1px 2px 8px rgba(0,0,0,.5);
+    z-index: 7;
 }
 
-.tailstock::after {
-    content: 'TAILSTOCK';
+/* === CNC PANEL === */
+.lc-cnc-panel {
+    position: absolute; top: 8px;
+    right: calc(13% + 6px);
+    z-index: 25;
+}
+.lc-screen {
+    width: 118px; height: 98px;
+    background: #050e08;
+    border: 2px solid #1a2e1e;
+    border-radius: 6px;
+    padding: 6px 7px;
+    box-shadow:
+        0 0 24px rgba(76,175,80,.16),
+        inset 0 0 24px rgba(0,0,0,.6),
+        0 0 0 1px rgba(76,175,80,.08);
+    position: relative;
+    overflow: hidden;
+}
+/* Screen scanline */
+.lc-screen::before {
+    content:'CNC FANUC 0i';
+    display: block; margin-bottom: 3px;
+    font-size: .4rem; color: #4CAF50;
+    font-family: monospace; letter-spacing: .8px;
+    text-shadow: 0 0 8px rgba(76,175,80,.9);
+    border-bottom: 1px solid rgba(76,175,80,.2);
+    padding-bottom: 3px;
+}
+.lc-screen::after {
+    content:'';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg,
+        transparent 0, transparent 2px,
+        rgba(0,0,0,.08) 2px, rgba(0,0,0,.08) 4px);
+    pointer-events: none;
+    animation: lcScanline 8s linear infinite;
+}
+@keyframes lcScanline {
+    from { background-position: 0 0; }
+    to   { background-position: 0 100%; }
+}
+.lc-screen-text {
+    font-family: 'Courier New', monospace;
+    font-size: .54rem; line-height: 1.7;
+    color: #6eff6e;
+    text-shadow: 0 0 5px rgba(76,175,80,.6);
+    white-space: pre;
+    animation: lcCursorBlink 1s step-end infinite;
+}
+
+/* === HANDWHEELS (CONVENTIONAL) === */
+.lc-handwheel {
+    position: absolute; border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%,
+        #62687a 0%, #464c5a 50%, #2c3040 100%);
+    border: 3px solid #545a6a;
+    box-shadow:
+        2px 4px 14px rgba(0,0,0,.6),
+        inset 0 2px 6px rgba(255,255,255,.05);
+    z-index: 22;
+}
+.lc-handwheel::before {
+    content:''; position: absolute;
+    top: 50%; left: 10%; width: 80%; height: 2px;
+    background: linear-gradient(90deg, transparent, #545a6a, transparent);
+    transform: translateY(-50%);
+}
+.lc-handwheel::after {
+    content:''; position: absolute;
+    top: 10%; left: 50%; width: 2px; height: 80%;
+    background: linear-gradient(180deg, transparent, #545a6a, transparent);
+    transform: translateX(-50%);
+}
+.lc-hw-hub {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 30%; height: 30%; border-radius: 50%;
+    background: radial-gradient(circle, #383d4a 0%, #1e2230 100%);
+    border: 2px solid #464c5a;
+}
+.lc-hw-carriage { width: 48px; height: 48px; bottom: calc(var(--lc-bed) + 5px); right: 27%; }
+.lc-hw-cross    { width: 38px; height: 38px; bottom: calc(var(--lc-bed) + 15px); right: 18%; }
+.lc-handwheel.spinning {
+    animation: lcHwSpin 1s linear infinite;
+}
+@keyframes lcHwSpin { to { transform: rotate(360deg); } }
+
+/* === GEAR BOX (CONVENTIONAL) === */
+.lc-gear-box {
+    position: absolute; left: 1%;
+    bottom: calc(var(--lc-bed) + 1px);
+    width: 40px; height: 48px;
+    background: linear-gradient(155deg, #3c4450 0%, #2e3440 100%);
+    border: 2px solid #4c5460; border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    z-index: 7;
+    box-shadow: 2px 0 10px rgba(0,0,0,.4), inset 0 1px 4px rgba(255,255,255,.03);
+}
+.lc-gear-box::after {
+    content:'GEAR'; position: absolute;
+    top: 6px; left: 50%; transform: translateX(-50%);
+    font-size: .34rem; color: #7a8090; font-weight: 800; letter-spacing: .5px;
+}
+.lc-gear-knob {
+    position: absolute; bottom: 9px; left: 50%;
+    transform: translateX(-50%);
+    width: 18px; height: 18px; border-radius: 50%;
+    background: radial-gradient(circle, #686e7a 0%, #3a3f4c 100%);
+    border: 2px solid #585e6a;
+    box-shadow: 0 2px 6px rgba(0,0,0,.5);
+    transition: transform .5s ease;
+}
+/* Gear knob notch */
+.lc-gear-knob::after {
+    content:''; position: absolute;
+    top: 2px; left: 50%; width: 2px; height: 5px;
+    background: rgba(255,255,255,.2);
+    transform: translateX(-50%);
+    border-radius: 1px;
+}
+
+/* === CHIP TRAY === */
+.lc-chip-tray {
+    position: absolute; bottom: 0; left: 14%; right: 12%;
+    height: 10px;
+    background: #141820;
+    border-top: 1px solid #242a36;
+    z-index: 3; overflow: hidden;
+}
+.lc-chip-pile {
+    position: absolute; bottom: 0;
+    left: 22%; right: 28%; height: 6px;
+    background: rgba(110,90,60,0);
+    border-radius: 4px 4px 0 0;
+    transition: background 1s, height .8s;
+}
+.lc-chip-pile.active {
+    background: rgba(120,100,65,.5);
+    height: 7px;
+    box-shadow: 0 0 8px rgba(180,140,80,.2);
+}
+
+/* === CNC PART COUNTER === */
+.lc-part-counter {
+    position: absolute; bottom: calc(var(--lc-bed) + 4px);
+    left: 15%;
+    font-size: .4rem; color: #4CAF50;
+    font-family: monospace;
+    text-shadow: 0 0 5px rgba(76,175,80,.7);
+    z-index: 12;
+    background: rgba(5,12,8,.88);
+    padding: 2px 6px; border-radius: 3px;
+    border: 1px solid rgba(76,175,80,.25);
+    letter-spacing: .5px;
+}
+
+/* === RPM DISPLAY (CONVENTIONAL) === */
+.lc-rpm-display {
+    position: absolute; bottom: calc(var(--lc-bed) + 4px);
+    right: calc(12% + 2px);
+    font-size: .44rem; color: #f0c040;
+    font-family: monospace;
+    z-index: 12;
+    background: rgba(10,8,4,.9);
+    padding: 3px 6px; border-radius: 3px;
+    border: 1px solid rgba(200,160,20,.3);
+    text-shadow: 0 0 5px rgba(240,192,64,.6);
+    transition: color .3s, text-shadow .3s;
+    letter-spacing: .3px;
+}
+
+/* === HEADSTOCK VIBRATION INDICATOR === */
+.lc-hs-indicator {
+    position: absolute; bottom: 16px; left: 50%;
+    transform: translateX(-50%);
+    width: 24px; height: 24px; border-radius: 50%;
+    background: radial-gradient(circle, #3a3f4c 0%, #242830 100%);
+    border: 2px solid #484e5c;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,.7);
+}
+
+/* === ELECTRICAL ARC (on heavy cuts) === */
+.lc-arc {
+    position: absolute; top: -20px; left: 45%;
+    width: 30px; height: 25px;
+    pointer-events: none; z-index: 23;
+    opacity: 0; transition: opacity .2s;
+}
+.lc-arc.active { opacity: 1; }
+.lc-arc-bolt {
+    position: absolute; top: 0; left: 50%;
+    width: 2px; height: 100%;
+    background: linear-gradient(180deg,
+        rgba(200,200,255,0) 0%,
+        rgba(180,180,255,.8) 30%,
+        #ffffff 50%,
+        rgba(180,180,255,.8) 70%,
+        rgba(200,200,255,0) 100%);
+    transform-origin: top center;
+    filter: blur(.5px);
+    animation: lcArcBolt .08s steps(1) infinite paused;
+    box-shadow: 0 0 4px rgba(200,200,255,.6), 0 0 10px rgba(150,150,255,.4);
+}
+.lc-arc.active .lc-arc-bolt { animation-play-state: running; }
+@keyframes lcArcBolt {
+    0%   { transform: skewX(0deg) scaleX(1); opacity: 1; }
+    25%  { transform: skewX(-15deg) scaleX(1.5); opacity: .7; }
+    50%  { transform: skewX(10deg) scaleX(.8); opacity: 1; }
+    75%  { transform: skewX(-8deg) scaleX(1.3); opacity: .6; }
+    100% { transform: skewX(5deg) scaleX(1.1); opacity: .9; }
+}
+
+/* === RESPONSIVE === */
+@media(max-width:1200px) {
+    .lathe-canvas {
+        height: 360px;
+        --lc-bed:58px; --lc-spindle:150px; --lc-wp-h:50px; --lc-wp-r:25px; --lc-chuck-r:35px;
+    }
+    .lc-screen { width: 100px; height: 84px; }
+}
+@media(max-width:900px) {
+    .lathe-canvas {
+        height: 316px;
+        --lc-bed:52px; --lc-spindle:132px; --lc-wp-h:44px; --lc-wp-r:22px; --lc-chuck-r:30px;
+    }
+    .lc-screen { width: 88px; height: 74px; }
+    .lc-screen-text { font-size: .48rem; }
+    .lc-hw-carriage { width: 40px; height: 40px; }
+    .lc-hw-cross { width: 32px; height: 32px; }
+}
+@media(max-width:640px) {
+    .lathe-canvas {
+        height: 278px;
+        --lc-bed:46px; --lc-spindle:116px; --lc-wp-h:38px; --lc-wp-r:19px; --lc-chuck-r:26px;
+    }
+    .lc-screen { width: 78px; height: 65px; }
+    .lc-screen-text { font-size: .42rem; }
+    .lc-hw-carriage { width: 36px; height: 36px; }
+    .lc-hw-cross { width: 28px; height: 28px; }
+    .lc-cnc-panel { right: calc(13% + 2px); }
+}
+@media(max-width:420px) {
+    .lathe-canvas {
+        height: 248px;
+        --lc-bed:42px; --lc-spindle:104px; --lc-wp-h:34px; --lc-wp-r:17px; --lc-chuck-r:23px;
+    }
+    .lc-screen { width: 68px; height: 57px; }
+    .lc-screen::before { font-size: .36rem; }
+    .lc-screen-text { font-size: .4rem; }
+    .lc-hw-carriage { width: 32px; height: 32px; }
+    .lc-hw-cross { width: 25px; height: 25px; }
+}
+/* === FIX PERSPECTIVA: workpiece tapa el chuck === */
+    /* === PERSPECTIVA CHUCK — orden de capas correcto === */
+    .lc-workpiece    { z-index: 11 !important; }
+    .lc-chuck        { z-index: 9  !important; }
+    .lc-spindle-nose { z-index: 7  !important; }
+
+    /* Máscara que oculta la parte del chuck que quedaría "dentro" del workpiece.
+       El workpiece empieza en left:20%, el chuck en left:14%.
+       El chuck tiene ancho = chuck-r*2. Ocultamos su mitad derecha
+       mediante un pseudo-elemento blanco que imita el workpiece */
+    .lc-chuck-mask {
+        position: absolute;
+        /* Se posiciona igual que el workpiece pero con z-index entre chuck y workpiece */
+        left: 20%;
+        top: calc(var(--lc-spindle) - var(--lc-wp-r));
+        width: 18px;            /* solapa suficiente para tapar el borde del chuck */
+        height: var(--lc-wp-h);
+        z-index: 10;
+        background: linear-gradient(90deg,
+            #2a3040 0%,          /* mismo color que el fondo oscuro del canvas */
+            #1e2530 100%);
+        pointer-events: none;
+    }
+
+    /* Gradiente de sombra en el extremo izquierdo del workpiece
+       para dar sensación de que el chuck "entra" en él */
+    .lc-wp-shadow-left {
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 10px;
+        background: linear-gradient(90deg,
+            rgba(0,0,0,.55) 0%,
+            transparent 100%);
+        border-radius: 2px 0 0 2px;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    /* Borde metálico donde el workpiece "sale" del chuck */
+    .lc-wp-chuck-joint {
+        position: absolute;
+        left: 0; top: -1px; bottom: -1px;
+        width: 4px;
+        background: linear-gradient(90deg,
+            #505868 0%, #6a7280 50%, #454d5a 100%);
+        box-shadow: 2px 0 6px rgba(0,0,0,.4);
+        z-index: 2;
+        border-radius: 1px;
+    }
+
+/* === LÁMPARA DE TRABAJO === */
+.lc-work-lamp {
+    position: absolute;
+    top: 8px;
+    left: 18%;
+    width: 6px;
+    height: 28px;
+    background: linear-gradient(180deg, #3a3f4a 0%, #2c3038 100%);
+    border-radius: 3px;
+    z-index: 28;
+    transform-origin: top center;
+    transform: rotate(25deg);
+    box-shadow: 1px 1px 6px rgba(0,0,0,.5);
+}
+.lc-work-lamp::before {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: -5px;
+    width: 16px; height: 10px;
+    background: linear-gradient(180deg, #555a66 0%, #3a3f48 100%);
+    border-radius: 3px 3px 6px 6px;
+    border: 1px solid #606570;
+}
+.lc-work-lamp-beam {
+    position: absolute;
+    bottom: -38px; left: -14px;
+    width: 42px; height: 38px;
+    background: radial-gradient(ellipse at 50% 0%,
+        rgba(255,240,180,.12) 0%,
+        rgba(255,230,150,.05) 50%,
+        transparent 80%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .6s;
+    border-radius: 0 0 50% 50%;
+    z-index: 27;
+}
+.lc-work-lamp-beam.active { opacity: 1; }
+.lc-work-lamp-tip {
+    position: absolute;
+    bottom: -2px; left: 50%;
+    transform: translateX(-50%);
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #f0e060;
+    box-shadow: 0 0 0 transparent;
+    transition: box-shadow .4s, background .4s;
+}
+.lc-work-lamp-tip.on {
+    background: #fff8a0;
+    box-shadow: 0 0 6px #ffe840, 0 0 14px rgba(255,220,60,.5);
+}
+
+/* === DISPLAY TEMPERATURA DIGITAL === */
+.lc-temp-display {
     position: absolute;
     top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.45rem;
-    color: #999;
-    font-weight: 700;
-    letter-spacing: 1px;
+    left: 15%;
+    background: #04080a;
+    border: 1.5px solid #1a3020;
+    border-radius: 4px;
+    padding: 3px 6px;
+    z-index: 26;
+    box-shadow: 0 0 10px rgba(0,200,100,.08), inset 0 0 8px rgba(0,0,0,.5);
+    min-width: 62px;
 }
-
-/* CNC Elements */
-.cnc-screen {
-    position: absolute;
-    right: 8%;
-    top: 15%;
-    width: 120px;
-    height: 100px;
-    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-    border: 4px solid #444;
-    border-radius: 6px;
-    box-shadow: 
-        0 4px 15px rgba(0,0,0,0.4),
-        inset 0 0 20px rgba(0,255,0,0.1);
-    z-index: 20;
-}
-
-.cnc-screen::before {
-    content: 'FANUC CNC';
-    position: absolute;
-    top: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.55rem;
-    color: #4CAF50;
-    font-weight: 700;
+.lc-temp-display::before {
+    content: 'TEMP °C';
+    display: block;
+    font-size: .32rem;
+    color: #406050;
     font-family: monospace;
+    letter-spacing: .8px;
+    margin-bottom: 1px;
+}
+.lc-temp-value {
+    font-family: 'Courier New', monospace;
+    font-size: .7rem;
+    font-weight: 700;
+    color: #00e060;
+    text-shadow: 0 0 6px rgba(0,220,80,.7);
     letter-spacing: 1px;
-    text-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    transition: color .4s, text-shadow .4s;
 }
+.lc-temp-value.warm { color: #f0a020; text-shadow: 0 0 6px rgba(240,160,30,.7); }
+.lc-temp-value.hot  { color: #ff3820; text-shadow: 0 0 8px rgba(255,60,20,.8); animation: lcTempBlink .5s step-end infinite; }
+@keyframes lcTempBlink { 50% { opacity: .4; } }
 
-.screen-display {
+/* === MANÓMETRO REFRIGERANTE === */
+.lc-pressure-gauge {
     position: absolute;
-    top: 22px;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
-    background: #0a3d0a;
-    border-radius: 3px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.55rem;
-    color: #4CAF50;
-    padding: 4px;
-    line-height: 1.3;
+    bottom: calc(var(--lc-bed) + 6px);
+    left: 16%;
+    width: 28px; height: 28px;
+    background: radial-gradient(circle at 40% 38%, #3a4050 0%, #1e2230 100%);
+    border: 2px solid #444c5c;
+    border-radius: 50%;
+    z-index: 13;
+    box-shadow: 1px 2px 8px rgba(0,0,0,.5);
     overflow: hidden;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-    animation: screenFlicker 3s infinite;
 }
-
-@keyframes screenFlicker {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.98; }
-}
-
-.cnc-turret {
-    position: absolute;
-    left: 48%;
-    top: 18%;
-    width: 90px;
-    height: 25px;
-    background: linear-gradient(135deg, #555 0%, #333 100%);
-    border: 3px solid #666;
-    border-radius: 6px;
-    transform: translateX(-50%);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    z-index: 12;
-}
-
-.cnc-turret::before {
-    content: 'TURRET';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 0.5rem;
-    color: #999;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-}
-
-.cnc-turret::after {
+.lc-pressure-gauge::before {
     content: '';
+    position: absolute; inset: 3px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.06);
+}
+.lc-pressure-gauge::after {
+    content: 'BAR';
     position: absolute;
-    top: -8px;
-    left: 50%;
+    bottom: 4px; left: 50%;
     transform: translateX(-50%);
-    width: 12px;
-    height: 12px;
-    background: #e74c3c;
-    border-radius: 50%;
-    box-shadow: 0 0 8px #e74c3c;
-    animation: turretLight 1.5s ease-in-out infinite;
+    font-size: .24rem; color: #606880; font-family: monospace; font-weight: 700;
 }
-
-@keyframes turretLight {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-}
-
-.cnc-control-panel {
+.lc-pressure-needle {
     position: absolute;
-    right: 5%;
-    bottom: 80px;
-    width: 70px;
-    height: 80px;
-    background: linear-gradient(135deg, #555 0%, #3a3a3a 100%);
-    border: 3px solid #666;
-    border-radius: 6px;
-    padding: 6px;
-    box-shadow: 
-        0 4px 15px rgba(0,0,0,0.4),
-        inset 0 2px 8px rgba(0,0,0,0.3);
-    z-index: 20;
+    bottom: 50%; left: 50%;
+    width: 1.5px; height: 38%;
+    background: linear-gradient(0deg, #ff4444 0%, #ff8888 100%);
+    transform-origin: bottom center;
+    transform: translateX(-50%) rotate(-60deg);
+    border-radius: 1px 1px 0 0;
+    transition: transform .6s cubic-bezier(.3,1.4,.4,1);
+    box-shadow: 0 0 3px rgba(255,80,80,.4);
+    z-index: 1;
+}
+.lc-pressure-cap {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #888; z-index: 2;
 }
 
-.cnc-button {
-    width: 10px;
-    height: 10px;
-    background: #444;
-    border-radius: 50%;
-    margin: 4px;
-    display: inline-block;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-    transition: all 0.3s ease;
-}
-
-.cnc-button.active {
-    background: #4CAF50;
-    box-shadow: 0 0 10px #4CAF50, inset 0 1px 2px rgba(255,255,255,0.3);
-    animation: buttonPulse 2s ease-in-out infinite;
-}
-
-@keyframes buttonPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
-
-.cnc-status-display {
+/* === INDICADOR DE DESGASTE DE HERRAMIENTA === */
+.lc-wear-indicator {
     position: absolute;
-    right: 5%;
-    top: 38%;
-    background: #1a1a1a;
-    border: 2px solid #444;
-    border-radius: 4px;
-    padding: 6px 10px;
+    top: 10px;
+    right: calc(13% + 8px);
+    width: 36px;
+    z-index: 26;
+}
+.lc-wear-label {
+    font-size: .3rem; color: #606880;
+    font-family: monospace; font-weight: 700;
+    text-align: center; letter-spacing: .5px;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+}
+.lc-wear-bar-bg {
+    width: 100%; height: 6px;
+    background: #1a1e28;
+    border: 1px solid #2e3240;
+    border-radius: 3px; overflow: hidden;
+}
+.lc-wear-bar-fill {
+    height: 100%; width: 15%;
+    background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+    border-radius: 3px;
+    transition: width .8s ease, background .5s;
+    box-shadow: 0 0 4px rgba(76,175,80,.4);
+}
+.lc-wear-bar-fill.medium {
+    background: linear-gradient(90deg, #FF9800 0%, #FFC107 100%);
+    box-shadow: 0 0 4px rgba(255,160,0,.5);
+}
+.lc-wear-bar-fill.high {
+    background: linear-gradient(90deg, #f44336 0%, #FF5722 100%);
+    box-shadow: 0 0 6px rgba(244,67,54,.6);
+    animation: lcWearPulse .6s ease-in-out infinite;
+}
+@keyframes lcWearPulse { 50% { opacity: .6; } }
+.lc-wear-pct {
+    font-size: .3rem; color: #8090a0;
+    font-family: monospace; text-align: right;
+    margin-top: 1px; letter-spacing: .3px;
+}
+
+/* === VIBRÓMETRO / SENSOR DE VIBRACIÓN === */
+.lc-vibro {
+    position: absolute;
+    bottom: calc(var(--lc-bed) + 6px);
+    right: calc(13% + 6px);
+    background: #04080a;
+    border: 1.5px solid #1a2030;
+    border-radius: 3px;
+    padding: 2px 5px;
+    z-index: 13;
+    min-width: 52px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,.4);
+}
+.lc-vibro::before {
+    content: 'VIBR mm/s';
+    display: block;
+    font-size: .28rem; color: #404860;
+    font-family: monospace; letter-spacing: .5px;
+}
+.lc-vibro-value {
     font-family: 'Courier New', monospace;
-    font-size: 0.6rem;
-    color: #4CAF50;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
-    z-index: 20;
+    font-size: .58rem; font-weight: 700;
+    color: #4080ff;
+    text-shadow: 0 0 5px rgba(60,120,255,.6);
+    transition: color .3s;
 }
+.lc-vibro-value.warn  { color: #ff9900; text-shadow: 0 0 5px rgba(255,150,0,.7); }
+.lc-vibro-value.alarm { color: #ff2200; text-shadow: 0 0 8px rgba(255,30,0,.8); animation: lcVibroBlink .3s step-end infinite; }
+@keyframes lcVibroBlink { 50% { opacity: 0; } }
 
-/* Conventional Lathe Elements */
-.hand-wheel {
+/* Waveform mini display */
+.lc-vibro-wave {
+    width: 100%; height: 8px;
+    position: relative; overflow: hidden;
+    margin-top: 1px;
+}
+.lc-vibro-line {
     position: absolute;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #666 0%, #444 40%, #333 100%);
-    border: 4px solid #555;
-    box-shadow: 
-        0 4px 12px rgba(0,0,0,0.4),
-        inset 0 2px 8px rgba(0,0,0,0.3);
-    z-index: 20;
+    top: 50%; left: -100%;
+    width: 200%; height: 1px;
+    background: transparent;
+    box-shadow: none;
+    transition: none;
 }
-
-.hand-wheel::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 15px;
-    height: 15px;
-    background: #222;
-    border-radius: 50%;
-    border: 2px solid #444;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
-}
-
-.hand-wheel::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 75%;
-    height: 3px;
-    background: linear-gradient(90deg, #555 0%, #666 50%, #555 100%);
-    transform: translate(-50%, -50%);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-}
-
-.hand-wheel.spinning {
-    animation: wheelRotate 3s linear infinite;
-}
-
-@keyframes wheelRotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.wheel-longitudinal {
-    bottom: 90px;
-    right: 25%;
-}
-
-.wheel-transversal {
-    bottom: 140px;
-    right: 20%;
-}
-
-.conv-lever {
-    position: absolute;
-    right: 15%;
-    top: 35%;
-    width: 10px;
-    height: 70px;
-    background: linear-gradient(180deg, #666 0%, #444 100%);
-    border-radius: 5px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    z-index: 20;
-}
-
-.conv-lever::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 20px;
-    background: radial-gradient(circle, #888 0%, #555 100%);
-    border-radius: 50%;
-    border: 3px solid #666;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-}
-
-.conv-dial {
-    position: absolute;
-    right: 8%;
-    top: 20%;
-    width: 55px;
-    height: 55px;
-    background: radial-gradient(circle, #555 0%, #333 100%);
-    border-radius: 50%;
-    border: 4px solid #666;
-    box-shadow: 
-        0 4px 12px rgba(0,0,0,0.3),
-        inset 0 2px 8px rgba(0,0,0,0.4);
-    z-index: 20;
-}
-
-.conv-dial::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 85%;
-    height: 85%;
-    background: repeating-conic-gradient(
-        from 0deg,
-        #444 0deg 9deg,
-        #555 9deg 10deg
+.lc-vibro-line.active {
+    background: linear-gradient(90deg,
+        transparent 0%, #4080ff 10%, #4080ff 90%, transparent 100%);
+    animation: lcVibroWave .15s linear infinite;
+    top: 4px;
+    clip-path: polygon(
+        0% 50%, 5% 20%, 10% 80%, 15% 10%, 20% 90%, 25% 30%,
+        30% 70%, 35% 15%, 40% 85%, 45% 35%, 50% 65%,
+        55% 20%, 60% 80%, 65% 25%, 70% 75%, 75% 40%,
+        80% 60%, 85% 30%, 90% 70%, 95% 45%, 100% 50%
     );
-    border-radius: 50%;
+    height: 8px;
 }
+@keyframes lcVibroWave { from { transform: translateX(0); } to { transform: translateX(50%); } }
 
-.conv-dial::after {
-    content: '';
+/* === ENCODER / POSICIÓN Z === */
+.lc-encoder {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 35%;
-    height: 35%;
-    background: #222;
-    border-radius: 50%;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
-}
-
-.conv-dial-pointer {
-    position: absolute;
-    top: 15%;
+    bottom: calc(var(--lc-bed) + 6px);
     left: 50%;
     transform: translateX(-50%);
-    width: 2px;
-    height: 20%;
-    background: #e74c3c;
-    border-radius: 2px;
-    box-shadow: 0 0 4px #e74c3c;
-}
-
-.gear-lever {
-    position: absolute;
-    left: 12%;
-    bottom: 95px;
-    width: 35px;
-    height: 60px;
-    background: linear-gradient(180deg, #555 0%, #333 100%);
-    border: 3px solid #444;
-    border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    z-index: 20;
-}
-
-.gear-lever::before {
-    content: '';
-    position: absolute;
-    bottom: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 55px;
-    height: 18px;
-    background: #2a2a2a;
-    border: 2px solid #444;
+    background: #030608;
+    border: 1.5px solid #18202c;
     border-radius: 3px;
+    padding: 2px 5px;
+    z-index: 13;
+    text-align: center;
+    min-width: 58px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,.4);
+}
+.lc-encoder::before {
+    content: 'POS Z (mm)';
+    display: block;
+    font-size: .28rem; color: #404050;
+    font-family: monospace; letter-spacing: .4px;
+}
+.lc-encoder-value {
+    font-family: 'Courier New', monospace;
+    font-size: .6rem; font-weight: 700;
+    color: #60d8ff;
+    text-shadow: 0 0 5px rgba(60,200,255,.6);
 }
 
-.gear-lever::after {
-    content: 'GEARS';
+/* === CONTADOR DE PIEZAS (CONV) === */
+.lc-conv-counter {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 0.45rem;
-    color: #999;
-    font-weight: 700;
+    bottom: calc(var(--lc-bed) + 4px);
+    left: 15%;
+    font-size: .4rem; color: #c0a030;
+    font-family: monospace;
+    text-shadow: 0 0 4px rgba(200,160,40,.5);
+    z-index: 12;
+    background: rgba(10,8,2,.88);
+    padding: 2px 5px; border-radius: 2px;
+    border: 1px solid rgba(200,160,40,.2);
 }
 
-.oil-reservoir {
+/* === INDICADOR DE MODO DE CORTE === */
+.lc-cut-mode-indicator {
     position: absolute;
-    right: 20%;
-    bottom: 85px;
-    width: 40px;
-    height: 50px;
-    background: linear-gradient(135deg, #444 0%, #222 100%);
-    border: 2px solid #555;
-    border-radius: 4px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-    z-index: 5;
+    top: 10px; left: 50%; transform: translateX(-50%);
+    background: rgba(5,8,14,.9);
+    border: 1px solid #2a3040;
+    border-radius: 12px;
+    padding: 2px 10px;
+    z-index: 27;
+    white-space: nowrap;
 }
+.lc-cut-mode-text {
+    font-size: .35rem; font-family: monospace; font-weight: 700;
+    color: #5080c0; letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: color .3s;
+}
+.lc-cut-mode-text.active { color: #40d060; text-shadow: 0 0 6px rgba(60,200,80,.6); }
 
-.oil-reservoir::before {
+/* === PROTECTOR DE VIRUTA (guarda) === */
+.lc-guard {
+    position: absolute;
+    left: 18%;
+    top: 20px;
+    width: 52%;
+    height: calc(var(--lc-spindle) - 10px);
+    border: 1.5px solid rgba(100,130,160,.15);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    pointer-events: none;
+    z-index: 4;
+    background: linear-gradient(180deg,
+        rgba(80,120,160,.04) 0%,
+        transparent 60%);
+}
+.lc-guard::before {
     content: '';
     position: absolute;
-    top: 6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 25px;
-    height: 30px;
-    background: rgba(255, 200, 100, 0.4);
-    border-radius: 3px;
-    animation: oilLevel 3s ease-in-out infinite;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg,
+        transparent 0%, rgba(100,150,200,.2) 30%,
+        rgba(100,150,200,.2) 70%, transparent 100%);
+    border-radius: 3px 3px 0 0;
 }
-
-@keyframes oilLevel {
-    0%, 100% { height: 30px; }
-    50% { height: 25px; }
-}
-
-.carriage-rail {
-    position: absolute;
-    left: 10%;
-    right: 10%;
-    bottom: 75px;
-    height: 10px;
-    background: linear-gradient(90deg, #555 0%, #666 50%, #555 100%);
-    border-top: 2px solid #444;
-    border-bottom: 2px solid #777;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    z-index: 5;
-}
-
-/* Coolant - Mejorado para caer sobre la herramienta */
-.coolant {
-    position: absolute;
-    top: 20%;
-    left: 48%;
-    width: 80px;
-    height: 120px;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s;
-    z-index: 8;
-}
-
-.coolant.active {
-    opacity: 0.6;
-}
-
-.coolant-stream {
-    position: absolute;
-    width: 2px;
-    height: 50px;
-    background: linear-gradient(180deg, rgba(100, 200, 255, 0.8) 0%, transparent 100%);
-    animation: coolantFlow 0.8s linear infinite;
-}
-
-.coolant-stream:nth-child(1) { left: 25px; animation-delay: 0s; }
-.coolant-stream:nth-child(2) { left: 35px; animation-delay: 0.2s; }
-.coolant-stream:nth-child(3) { left: 45px; animation-delay: 0.4s; }
-
-@keyframes coolantFlow {
-    0% {
-        transform: translateY(-20px);
-        opacity: 0;
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(80px);
-        opacity: 0;
-    }
-}
-
-/* Chips - Caen más naturalmente */
-.chips {
-    position: absolute;
-    top: 40%;
-    left: 48%;
-    width: 120px;
-    height: 80px;
-    pointer-events: none;
-    z-index: 11;
-}
-
-.chip {
-    position: absolute;
-    width: 12px;
-    height: 2px;
-    background: linear-gradient(90deg, var(--ipn-guinda-dark) 0%, var(--ipn-guinda) 50%, var(--ipn-guinda-light) 100%);
-    border-radius: 2px;
-    opacity: 0;
-    animation: chipFall 1.5s ease-in infinite;
-    box-shadow: 0 2px 4px rgba(109, 31, 65, 0.4);
-}
-
-.chip:nth-child(1) { animation-delay: 0s; left: 20px; }
-.chip:nth-child(2) { animation-delay: 0.3s; left: 30px; }
-.chip:nth-child(3) { animation-delay: 0.6s; left: 40px; }
-.chip:nth-child(4) { animation-delay: 0.9s; left: 50px; }
-.chip:nth-child(5) { animation-delay: 1.2s; left: 60px; }
-
-@keyframes chipFall {
-    0% {
-        transform: translate(0, 0) rotate(0deg);
-        opacity: 1;
-    }
-    100% {
-        transform: translate(-40px, 120px) rotate(-180deg);
-        opacity: 0;
-    }
-}
-
-/* Sparks - Para materiales duros */
-.sparks {
-    position: absolute;
-    top: 43%;
-    left: 50%;
-    width: 60px;
-    height: 60px;
-    pointer-events: none;
-    opacity: 0;
-    z-index: 11;
-}
-
-.sparks.active {
-    opacity: 1;
-}
-
-.spark {
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    background: #ffeb3b;
-    border-radius: 50%;
-    box-shadow: 0 0 4px #ffeb3b;
-    opacity: 0;
-    animation: sparkFly 0.6s ease-out infinite;
-}
-
-.spark:nth-child(1) { animation-delay: 0s; }
-.spark:nth-child(2) { animation-delay: 0.1s; }
-.spark:nth-child(3) { animation-delay: 0.2s; }
-.spark:nth-child(4) { animation-delay: 0.3s; }
-.spark:nth-child(5) { animation-delay: 0.4s; }
-
-@keyframes sparkFly {
-    0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 1;
-    }
-    100% {
-        transform: translate(calc(-30px + var(--spark-x, 0)), calc(40px + var(--spark-y, 0))) scale(0);
-        opacity: 0;
-    }
-}
-
-.spark:nth-child(1) { --spark-x: -10px; --spark-y: 5px; }
-.spark:nth-child(2) { --spark-x: 0px; --spark-y: 10px; }
-.spark:nth-child(3) { --spark-x: 10px; --spark-y: 8px; }
-.spark:nth-child(4) { --spark-x: -5px; --spark-y: 12px; }
-.spark:nth-child(5) { --spark-x: 5px; --spark-y: 6px; }
-
         /* Stats panel - BURBUJAS CIRCULARES */
+        /* Stats panel — NUEVO DISEÑO EXPANDIDO */
         .stats-panel {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            gap: 1.5rem;
-            margin: 1.5rem 0;
-            padding: 1.5rem;
-            background: linear-gradient(135deg, rgba(109, 31, 65, 0.05) 0%, rgba(109, 31, 65, 0.02) 100%);
-            border-radius: 12px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: .7rem;
+            margin: 1.2rem 0;
+            padding: 1rem 1.2rem;
+            background: linear-gradient(135deg,
+                rgba(109,31,65,.06) 0%,
+                rgba(109,31,65,.02) 100%);
+            border-radius: 10px;
             border: 1px solid var(--border-color);
         }
+
+        /* Fila inferior con parámetros adicionales */
+        .stats-panel-row2 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: .6rem;
+            margin: -.5rem 0 1rem 0;
+            padding: .7rem 1.2rem;
+            background: linear-gradient(135deg,
+                rgba(109,31,65,.03) 0%,
+                rgba(109,31,65,.01) 100%);
+            border-radius: 0 0 10px 10px;
+            border: 1px solid var(--border-color);
+            border-top: none;
+        }
+
+        /* Tarjeta de parámetro — estilo rectangular pequeño */
+        .stat-mini {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: .5rem .3rem;
+            background: var(--ipn-white);
+            border-radius: 6px;
+            border: 2px solid var(--border-color);
+            transition: border-color .3s, box-shadow .3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-mini::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--border-color);
+            transition: background .3s;
+        }
+        .stat-mini.ok    { border-color: #27ae60; }
+        .stat-mini.ok::before    { background: #27ae60; }
+        .stat-mini.warn  { border-color: #f39c12; }
+        .stat-mini.warn::before  { background: #f39c12; }
+        .stat-mini.danger{ border-color: #e74c3c; }
+        .stat-mini.danger::before{ background: #e74c3c; }
+
+        .stat-mini-label {
+            font-size: .62rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            text-align: center;
+            margin-bottom: .2rem;
+            white-space: nowrap;
+        }
+        .stat-mini-value {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--ipn-guinda);
+            font-family: 'Roboto Condensed', sans-serif;
+            transition: color .3s;
+            text-align: center;
+        }
+        .stat-mini-value.ok     { color: #27ae60; }
+        .stat-mini-value.warn   { color: #f39c12; }
+        .stat-mini-value.danger { color: #e74c3c; }
+        .stat-mini-unit {
+            font-size: .58rem;
+            color: var(--text-light);
+            margin-top: .1rem;
+        }
+        /* Icono semáforo */
+        .stat-mini-dot {
+            position: absolute; top: 5px; right: 6px;
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--border-color);
+            transition: background .3s, box-shadow .3s;
+        }
+        .stat-mini.ok .stat-mini-dot    { background: #27ae60; box-shadow: 0 0 4px rgba(39,174,96,.5); }
+        .stat-mini.warn .stat-mini-dot  { background: #f39c12; box-shadow: 0 0 4px rgba(243,156,18,.5); }
+        .stat-mini.danger .stat-mini-dot{ background: #e74c3c; box-shadow: 0 0 4px rgba(231,76,60,.5); animation: dotBlink .7s step-end infinite; }
+        @keyframes dotBlink { 50% { opacity: 0; } }
+
 
         .stat-bubble {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--ipn-white) 0%, var(--ipn-cream) 100%);
             border: 3px solid var(--ipn-guinda);
@@ -1279,7 +1975,7 @@
         }
 
         .stat-label {
-            font-size: 0.75rem;
+            font-size: 0.68rem;
             color: var(--text-light);
             margin-bottom: 0.3rem;
             text-transform: uppercase;
@@ -1288,7 +1984,7 @@
         }
 
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: var(--ipn-guinda);
             font-family: 'Roboto Condensed', sans-serif;
@@ -1527,8 +2223,8 @@
             }
             
             .stat-bubble {
-                width: 100px;
-                height: 100px;
+                width: 88px;
+                height: 88px;
             }
         }
 
@@ -1593,8 +2289,8 @@
             }
 
             .stat-bubble {
-                width: 140px;
-                height: 140px;
+                width: 115px;
+                height: 115px;
             }
 
             .stat-label {
@@ -1602,7 +2298,7 @@
             }
 
             .stat-value {
-                font-size: 1.3rem;
+                font-size: 1.1rem;
             }
 
             .control-group {
@@ -2180,16 +2876,87 @@
                 <div class="card-content">
                     <p>La <strong>velocidad de corte (Vc)</strong> es la velocidad lineal a la que el filo de la herramienta se desplaza sobre la superficie de la pieza. Se mide en <strong>m/min</strong> (metros por minuto) y es uno de los parámetros más críticos en el torneado. Abajo cada tarjeta incluye: <em>Desbaste</em> y <em>Acabado</em> (dos rangos), <strong>Avance recomendado (mm/rev)</strong> y <strong>Profundidad de corte (ap) sugerida</strong> para desbaste y acabado.</p>
                     
-                    <div class="highlight-box">
-                        <p><strong>Fórmula de RPM:</strong> n = (1000 × Vc) / (π × D)</p>
-                        <p style="margin-top: 0.5rem;">Donde:</p>
-                        <ul style="margin-left: 2rem; margin-top: 0.5rem;">
-                            <li>n = Revoluciones por minuto (RPM)</li>
-                            <li>Vc = Velocidad de corte (m/min)</li>
-                            <li>D = Diámetro de la pieza (mm)</li>
-                            <li>π ≈ 3.14159</li>
-                        </ul>
+<div class="highlight-box">
+    <p><strong>Fórmula de RPM:</strong> n = (1000 × Vc) / (π × D)</p>
+    <p style="margin-top: 0.5rem;">Donde: <strong>n</strong> = RPM &nbsp;|&nbsp; <strong>Vc</strong> = Velocidad de corte (m/min) &nbsp;|&nbsp; <strong>D</strong> = Diámetro (mm) &nbsp;|&nbsp; <strong>π</strong> ≈ 3.14159</p>
+
+    <!-- CALCULADORA -->
+    <div style="margin-top: 1.2rem; padding: 1.2rem; background: var(--ipn-white); border-radius: 8px; border: 2px solid var(--border-color);">
+
+        <!-- Fórmula visual con inputs -->
+        <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .5rem; font-size: 1.1rem; font-weight: 600; color: var(--text-dark); font-family: 'Roboto Condensed', sans-serif;">
+
+            <!-- n -->
+            <div style="display: flex; flex-direction: column; align-items: center; gap: .2rem;">
+                <input id="c_n" type="number" min="0" placeholder="?" style="width: 90px; padding: .4rem .5rem; text-align: center; border: 2px solid var(--ipn-guinda); border-radius: 4px; font-size: 1rem; font-family: 'Roboto Condensed', sans-serif; font-weight: 700; color: var(--ipn-guinda); background: #fdf8fb; outline: none;">
+                <span style="font-size: .68rem; color: var(--text-light); text-transform: uppercase; letter-spacing: .4px;">n (RPM)</span>
+            </div>
+
+            <span style="font-size: 1.3rem; color: var(--text-light);">=</span>
+
+            <!-- Fracción 1000 × Vc / π × D -->
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                <!-- Numerador -->
+                <div style="display: flex; align-items: center; gap: .4rem;">
+                    <span style="color: var(--text-light);">1000 ×</span>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: .2rem;">
+                        <input id="c_vc" type="number" min="0" placeholder="?" style="width: 80px; padding: .4rem .5rem; text-align: center; border: 2px solid var(--ipn-guinda); border-radius: 4px; font-size: 1rem; font-family: 'Roboto Condensed', sans-serif; font-weight: 700; color: var(--ipn-guinda); background: #fdf8fb; outline: none;">
+                        <span style="font-size: .68rem; color: var(--text-light); text-transform: uppercase; letter-spacing: .4px;">Vc (m/min)</span>
                     </div>
+                </div>
+                <!-- Línea divisora -->
+                <div style="width: 100%; height: 2px; background: var(--text-dark); border-radius: 1px; margin: 2px 0;"></div>
+                <!-- Denominador -->
+                <div style="display: flex; align-items: center; gap: .4rem;">
+                    <span style="color: var(--text-light);">π ×</span>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: .2rem;">
+                        <input id="c_d" type="number" min="0" placeholder="?" style="width: 80px; padding: .4rem .5rem; text-align: center; border: 2px solid var(--ipn-guinda); border-radius: 4px; font-size: 1rem; font-family: 'Roboto Condensed', sans-serif; font-weight: 700; color: var(--ipn-guinda); background: #fdf8fb; outline: none;">
+                        <span style="font-size: .68rem; color: var(--text-light); text-transform: uppercase; letter-spacing: .4px;">D (mm)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instrucción -->
+        <p style="text-align: center; font-size: .8rem; color: var(--text-light); margin: .8rem 0 .6rem 0;">
+            Deja en <strong>?</strong> el valor que quieres calcular y llena los otros dos
+        </p>
+
+        <!-- Botones -->
+        <div style="display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap;">
+            <button onclick="calcRPM()"
+                style="background: var(--ipn-guinda); color: #fff; border: none; padding: .6rem 1.8rem;
+                       border-radius: 4px; font-size: .95rem; font-weight: 600; cursor: pointer;
+                       font-family: 'Roboto Condensed', sans-serif; letter-spacing: .5px;
+                       transition: background .2s;"
+                onmouseover="this.style.background='var(--ipn-guinda-dark)'"
+                onmouseout="this.style.background='var(--ipn-guinda)'">
+                CALCULAR
+            </button>
+            <button onclick="clearRPM()"
+                style="background: transparent; color: var(--ipn-guinda); border: 2px solid var(--ipn-guinda);
+                       padding: .6rem 1.4rem; border-radius: 4px; font-size: .95rem; font-weight: 600;
+                       cursor: pointer; font-family: 'Roboto Condensed', sans-serif;
+                       transition: all .2s;"
+                onmouseover="this.style.background='var(--ipn-guinda)'; this.style.color='#fff'"
+                onmouseout="this.style.background='transparent'; this.style.color='var(--ipn-guinda)'">
+                LIMPIAR
+            </button>
+        </div>
+
+        <!-- Resultado -->
+        <div id="rpm_result" style="display:none; margin-top: .9rem; padding: .8rem 1rem;
+             background: rgba(39,174,96,.08); border-left: 4px solid #27ae60; border-radius: 4px;
+             text-align: center; animation: slideIn .3s ease;">
+            <div id="rpm_result_txt" style="font-size: 1.3rem; font-weight: 700; color: #27ae60;
+                 font-family: 'Roboto Condensed', sans-serif;"></div>
+            <div id="rpm_result_formula" style="font-size: .8rem; color: var(--text-light); margin-top: .3rem;"></div>
+        </div>
+        <div id="rpm_error" style="display:none; margin-top: .9rem; padding: .7rem 1rem;
+             background: rgba(231,76,60,.08); border-left: 4px solid #e74c3c; border-radius: 4px;
+             text-align: center; color: #c0392b; font-size: .88rem;"></div>
+    </div>
+</div>
 
                     <p style="margin-top: 1.5rem;"><strong>Busca por material, clasificación ISO, velocidad o herramienta:</strong></p>
                     <input type="text" id="materialSearch" class="search-box"
@@ -3034,13 +3801,13 @@
                     <div class="highlight-box" style="margin-top: 2rem;">
                         <p><strong>Notas sobre velocidades y parámetros:</strong></p>
                         <ul style="margin-left: 1.2rem;">
-                            <li>• Los rangos indicados son orientativos y deben ajustarse según la máquina, rigidez, estado de filo, refrigeración, herramienta y diámetro real de la pieza.</li>
-                            <li>• RPM calculadas para diámetro de 50mm usando: RPM = (1000 × Vc) / (π × D). Usa diámetros y Vc reales para calcular n exacta.</li>
-                            <li>• Avance (mm/rev) y ap (mm) están separados para <em>desbaste</em> (mayor remoción) y <em>acabado</em> (mejor calidad superficial).</li>
-                            <li>• Para CNC con control G96 (velocidad constante) los valores CNC pueden optimizarse y ser más altos en acabados.</li>
-                            <li>• Refrigeración recomendada para aceros inoxidables, titanio, superaleaciones y cobre-berilio. Para plásticos y magnesio seguir normas de seguridad (riesgo de ignición y deformación).</li>
-                            <li>• Herramientas: PCD para plásticos blandos y materiales abrasivos en producción; CBN para aceros endurecidos y cerámica para altas temperaturas; carburo recubierto para uso general.</li>
-                            <li>• Siempre validar con una pasada de prueba, medir temperatura, vibración y desgaste de la herramienta; ajustar parámetros en consecuencia.</li>
+                            <li>Los rangos indicados son orientativos y deben ajustarse según la máquina, rigidez, estado de filo, refrigeración, herramienta y diámetro real de la pieza.</li>
+                            <li>RPM calculadas para diámetro de 50mm usando: RPM = (1000 × Vc) / (π × D). Usa diámetros y Vc reales para calcular n exacta.</li>
+                            <li>Avance (mm/rev) y ap (mm) están separados para <em>desbaste</em> (mayor remoción) y <em>acabado</em> (mejor calidad superficial).</li>
+                            <li>Para CNC con control G96 (velocidad constante) los valores CNC pueden optimizarse y ser más altos en acabados.</li>
+                            <li>Refrigeración recomendada para aceros inoxidables, titanio, superaleaciones y cobre-berilio. Para plásticos y magnesio seguir normas de seguridad (riesgo de ignición y deformación).</li>
+                            <li>Herramientas: PCD para plásticos blandos y materiales abrasivos en producción; CBN para aceros endurecidos y cerámica para altas temperaturas; carburo recubierto para uso general.</li>
+                            <li>Siempre validar con una pasada de prueba, medir temperatura, vibración y desgaste de la herramienta; ajustar parámetros en consecuencia.</li>
                         </ul>
                     </div>
                 </div>
@@ -3095,87 +3862,149 @@
                         </select>
                     </div>
 
-                    <div class="lathe-canvas">
-                        <div class="machine-base"></div>
-                        <div class="headstock">
-                            <div class="spindle"></div>
-                            <div class="chuck">
-                                <div class="chuck-jaw"></div>
-                                <div class="chuck-jaw"></div>
-                            </div>
+<div class="lathe-canvas" id="cncCanvas">
+  <div class="lc-ambient" id="cncAmbient"></div>
+  <canvas class="lc-particle-canvas" id="cncParticleCanvas"></canvas>
+    <div class="lc-heat-shimmer" id="cncHeatShimmer"></div>
+    <div class="lc-floor-reflect" id="cncFloorReflect"></div>
+    <div class="lc-bed-ways"></div>
+    <div class="lc-hs-led-strip" id="cncHsLedStrip"></div>
+  <div class="lc-bed"><div class="lc-chip-tray"><div class="lc-chip-pile" id="cncChipPile"></div></div></div>
+  <div class="lc-headstock"><div class="lc-hs-indicator" id="cncHsInd"></div></div>
+  <div class="lc-spindle-nose"></div>
+  <div class="lc-chuck" id="cncChuck">
+    <div class="lc-chuck-body">
+      <div class="lc-jaw lc-jaw-1"></div><div class="lc-jaw lc-jaw-2"></div><div class="lc-jaw lc-jaw-3"></div>
+      <div class="lc-chuck-hub"></div>
+    </div>
+  </div>
+    <div class="lc-chuck-mask"></div>
+    <div class="lc-workpiece" id="cncWorkpiece">
+      <div class="lc-wp-body">
+        <div class="lc-wp-shadow-left"></div>
+        <div class="lc-wp-chuck-joint"></div>
+      <div class="lc-wp-lines" id="cncWpLines"></div>
+      <div class="lc-wp-heat" id="cncWpHeat"></div>
+      <div class="lc-wp-machined" id="cncMachined"></div>
+      <div class="lc-wp-shoulder" id="cncShoulder"></div>
+    </div>
+  </div>
+  <div class="lc-carriage" id="cncCarriage">
+    <div class="lc-turret"><div class="lc-turret-led" id="cncTurretLed"></div></div>
+  </div>
+  <div class="lc-tool-assembly" id="cncToolAssembly">
+    <div class="lc-plasma" id="cncPlasma"><div class="lc-plasma-core"></div></div>
+    <div class="lc-arc" id="cncArc"><div class="lc-arc-bolt"></div></div>
+    <div class="lc-chips" id="cncChipsFV">
+      <div class="lc-chip lc-chip-c paused"></div>
+      <div class="lc-chip lc-chip-c paused"></div>
+      <div class="lc-chip lc-chip-l paused"></div>
+      <div class="lc-chip lc-chip-c paused"></div>
+      <div class="lc-chip lc-chip-l paused"></div>
+    </div>
+    <div class="lc-coolant-nozzle" id="cncCoolantNozzle"></div>
+    <div class="lc-coolant" id="cncCoolantFV">
+      <div class="lc-coolant-jet"></div><div class="lc-coolant-jet"></div>
+    </div>
+    <div class="lc-sparks" id="cncSparksFV">
+      <div class="lc-spark"></div><div class="lc-spark"></div><div class="lc-spark"></div>
+      <div class="lc-spark"></div><div class="lc-spark"></div><div class="lc-spark"></div>
+    </div>
+    <div class="lc-insert" id="cncInsert"></div>
+    <div class="lc-insert-arm"></div>
+  </div>
+  <div class="lc-tailstock"><div class="lc-ts-quill"></div><div class="lc-ts-hw"></div></div>
+    <!-- Lámpara de trabajo -->
+  <div class="lc-work-lamp" id="cncLamp">
+    <div class="lc-work-lamp-beam" id="cncLampBeam"></div>
+    <div class="lc-work-lamp-tip" id="cncLampTip"></div>
+  </div>
+  <!-- Temperatura -->
+  <div class="lc-temp-display" id="cncTempDisp">
+    <div class="lc-temp-value" id="cncTempVal">025</div>
+  </div>
+  <!-- Manómetro refrigerante -->
+  <div class="lc-pressure-gauge" id="cncPressGauge">
+    <div class="lc-pressure-needle" id="cncPressNeedle"></div>
+    <div class="lc-pressure-cap"></div>
+  </div>
+  <!-- Desgaste herramienta -->
+  <div class="lc-wear-indicator" id="cncWearInd">
+    <div class="lc-wear-label">DESGASTE</div>
+    <div class="lc-wear-bar-bg"><div class="lc-wear-bar-fill" id="cncWearFill"></div></div>
+    <div class="lc-wear-pct" id="cncWearPct">15%</div>
+  </div>
+  <!-- Vibrómetro -->
+  <div class="lc-vibro" id="cncVibro">
+    <div class="lc-vibro-value" id="cncVibroVal">0.00</div>
+    <div class="lc-vibro-wave"><div class="lc-vibro-line" id="cncVibroLine"></div></div>
+  </div>
+  <!-- Posición Z encoder -->
+  <div class="lc-encoder" id="cncEncoder">
+    <div class="lc-encoder-value" id="cncEncoderVal">Z+000.00</div>
+  </div>
+  <!-- Modo de corte -->
+  <div class="lc-cut-mode-indicator">
+    <div class="lc-cut-mode-text active" id="cncCutMode">G96 — CORTE ACTIVO</div>
+  </div>
+  <!-- Protector de viruta -->
+  <div class="lc-guard"></div>
+  <div class="lc-cnc-panel">
+    <div class="lc-screen"><div class="lc-screen-text" id="cncScreenFV">G96 S180
+F0.25
+X50.000 Z0.000
+RPM: 1146</div></div>
+  </div>
+  <div class="lc-part-counter" id="cncPartCounter">PC:001 | O0001</div>
+</div>
+
+                    <div class="stats-panel">
+                        <div class="stat-mini" id="cncRPMBubble">
+                            <div class="stat-mini-dot"></div>
+                            <div class="stat-mini-label">RPM</div>
+                            <div class="stat-mini-value" id="cncRPMStat">1146</div>
+                            <div class="stat-mini-unit">rev/min</div>
                         </div>
-                        <div class="cnc-screen">
-                            <div class="screen-display" id="cncScreenDisplay">G96 S<span id="screenVc">180</span>
-F<span id="screenFeed">0.25</span>
-X<span id="screenX">50.0</span>
-Z<span id="screenZ">100.0</span>
-TOOL 01
-RPM:<span id="screenRPM">1146</span></div>
+                        <div class="stat-mini" id="cncMRRBubble">
+                            <div class="stat-mini-dot"></div>
+                            <div class="stat-mini-label">MRR</div>
+                            <div class="stat-mini-value" id="cncMRRStat">0.00</div>
+                            <div class="stat-mini-unit">cm³/min</div>
                         </div>
-                        <div class="cnc-status-display">READY
-AUTO</div>
-                        <div class="cnc-control-panel">
-                            <div class="cnc-button active"></div>
-                            <div class="cnc-button active"></div>
-                            <div class="cnc-button"></div>
-                            <div class="cnc-button active"></div>
-                            <div class="cnc-button"></div>
-                            <div class="cnc-button"></div>
-                            <div class="cnc-button active"></div>
-                            <div class="cnc-button"></div>
+                        <div class="stat-mini" id="cncStatusBubble">
+                            <div class="stat-mini-dot"></div>
+                            <div class="stat-mini-label">Estado</div>
+                            <div class="stat-mini-value" id="cncStatusStat">ÓPTIMO</div>
                         </div>
-                        <div class="cnc-turret"></div>
-                        <div class="carriage-rail"></div>
-                        <div class="workpiece spinning" id="cncWorkpiece">
-                            <div class="workpiece-outer">
-                                <div class="cylinder">
-                                    <div class="machining-marks"></div>
-                                </div>
-                            </div>
+                    </div>
+                    <!-- Fila 2: parámetros adicionales -->
+                    <div class="stats-panel-row2">
+                        <div class="stat-mini" id="cncFeedStatCard">
+                            <div class="stat-mini-dot"></div>
+                            <div class="stat-mini-label">Avance (f)</div>
+                            <div class="stat-mini-value" id="cncFeedStat">0.25</div>
+                            <div class="stat-mini-unit">mm/rev</div>
                         </div>
-                        <div class="tool-post" id="cncToolPost">
-                            <div class="tool-holder">
-                                <div class="cutting-tool" id="cncCuttingTool"></div>
-                            </div>
+                        <div class="stat-mini" id="cncDepthStatCard">
+                            <div class="stat-mini-dot"></div>
+                            <div class="stat-mini-label">Prof. corte (ap)</div>
+                            <div class="stat-mini-value" id="cncDepthStat">2.0</div>
+                            <div class="stat-mini-unit">mm</div>
                         </div>
-                        <div class="coolant" id="cncCoolant">
-                            <div class="coolant-stream"></div>
-                            <div class="coolant-stream"></div>
-                            <div class="coolant-stream"></div>
+                        <div class="stat-mini" id="cncVcStatCard">
+                            <div class="stat-mini-dot"></div>
+                            <div class="stat-mini-label">Vel. corte (Vc)</div>
+                            <div class="stat-mini-value" id="cncVcStat2">180</div>
+                            <div class="stat-mini-unit">m/min</div>
                         </div>
-                        <div class="sparks" id="cncSparks">
-                            <div class="spark"></div>
-                            <div class="spark"></div>
-                            <div class="spark"></div>
-                            <div class="spark"></div>
-                            <div class="spark"></div>
-                        </div>
-                        <div class="tailstock"></div>
-                        <div class="chips" id="cncChips">
-                            <div class="chip"></div>
-                            <div class="chip"></div>
-                            <div class="chip"></div>
-                            <div class="chip"></div>
-                            <div class="chip"></div>
+                        <div class="stat-mini" id="cncRaStatCard">
+                            <div class="stat-mini-dot"></div>
+                            <div class="stat-mini-label">Ra teórico</div>
+                            <div class="stat-mini-value" id="cncRaStat">—</div>
+                            <div class="stat-mini-unit">μm</div>
                         </div>
                     </div>
 
-                    <div class="stats-panel">
-                        <div class="stat-bubble" id="cncRPMBubble">
-                            <div class="stat-label">RPM</div>
-                            <div class="stat-value" id="cncRPMStat">1146</div>
-                            <div class="stat-unit">rev/min</div>
-                        </div>
-                        <div class="stat-bubble" id="cncMRRBubble">
-                            <div class="stat-label">MRR</div>
-                            <div class="stat-value" id="cncMRRStat">0.0</div>
-                            <div class="stat-unit">cm³/min</div>
-                        </div>
-                        <div class="stat-bubble optimal" id="cncStatusBubble">
-                            <div class="stat-label">Estado</div>
-                            <div class="stat-value optimal" id="cncStatusStat">ÓPTIMO</div>
-                        </div>
-                    </div>
 
                     <div class="alert-box alert-optimal" id="cncAlertOptimal">
                         <strong>Parámetros óptimos:</strong> Los valores están dentro del rango recomendado para este material.
@@ -3238,7 +4067,7 @@ AUTO</div>
                         <div class="control-label">
                             <span class="label-text">Material a tornear</span>
                         </div>
-                        <select id="cncMaterial" onchange="updateCNCMaterial()">
+                            <select id="convMaterial" onchange="updateConvMaterial()">
                             <option value="steel">Acero Dulce 1018/1020 (160-250 m/min)</option>
                             <option value="steel_1045">Acero 1045 (140-220 m/min)</option>
                             <option value="lowalloy">Acero Baja Aleación 4140/4340 (100-190 m/min)</option>
@@ -3266,72 +4095,139 @@ AUTO</div>
                         </select>
                     </div>
                     
-                    <div class="lathe-canvas">
-                        <div class="machine-base"></div>
-                        <div class="headstock">
-                            <div class="spindle"></div>
-                            <div class="chuck">
-                                <div class="chuck-jaw"></div>
-                                <div class="chuck-jaw"></div>
-                            </div>
-                        </div>
-                        <div class="gear-lever"></div>
-                        <div class="hand-wheel wheel-longitudinal" id="convWheelLong"></div>
-                        <div class="hand-wheel wheel-transversal" id="convWheelTrans"></div>
-                        <div class="conv-lever"></div>
-                        <div class="conv-dial">
-                            <div class="conv-dial-pointer"></div>
-                        </div>
-                        <div class="oil-reservoir"></div>
-                        <div class="carriage-rail"></div>
-                        <div class="workpiece spinning" id="convWorkpiece">
-                            <div class="workpiece-outer">
-                                <div class="cylinder">
-                                    <div class="machining-marks"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tool-post" id="convToolPost">
-                            <div class="tool-holder">
-                                <div class="cutting-tool" id="convCuttingTool"></div>
-                            </div>
-                        </div>
-                        <div class="coolant" id="convCoolant">
-                            <div class="coolant-stream"></div>
-                            <div class="coolant-stream"></div>
-                            <div class="coolant-stream"></div>
-                        </div>
-                        <div class="sparks" id="convSparks">
-                            <div class="spark"></div>
-                            <div class="spark"></div>
-                            <div class="spark"></div>
-                            <div class="spark"></div>
-                            <div class="spark"></div>
-                        </div>
-                        <div class="tailstock"></div>
-                        <div class="chips" id="convChips">
-                            <div class="chip"></div>
-                            <div class="chip"></div>
-                            <div class="chip"></div>
-                            <div class="chip"></div>
-                            <div class="chip"></div>
-                        </div>
-                    </div>
+<div class="lathe-canvas" id="convCanvas">
+  <div class="lc-ambient" id="convAmbient"></div>
+  <div class="lc-bed"><div class="lc-chip-tray"><div class="lc-chip-pile" id="convChipPile"></div></div></div>
+  <div class="lc-headstock"><div class="lc-hs-indicator" id="convHsInd"></div></div>
+  <div class="lc-spindle-nose"></div>
+  <div class="lc-chuck" id="convChuck">
+    <div class="lc-chuck-body">
+      <div class="lc-jaw lc-jaw-1"></div><div class="lc-jaw lc-jaw-2"></div><div class="lc-jaw lc-jaw-3"></div>
+      <div class="lc-chuck-hub"></div>
+    </div>
+  </div>
+    <div class="lc-chuck-mask"></div>
+    <div class="lc-workpiece" id="convWorkpiece">
+      <div class="lc-wp-body">
+        <div class="lc-wp-shadow-left"></div>
+        <div class="lc-wp-chuck-joint"></div>
+      <div class="lc-wp-lines" id="convWpLines"></div>
+      <div class="lc-wp-heat" id="convWpHeat"></div>
+      <div class="lc-wp-machined" id="convMachined"></div>
+      <div class="lc-wp-shoulder" id="convShoulder"></div>
+    </div>
+  </div>
+  <div class="lc-carriage" id="convCarriage">
+    <div class="lc-tool-post-conv"></div>
+    <div class="lc-apron"><div class="lc-feed-lever" id="convFeedLever"></div></div>
+  </div>
+  <div class="lc-tool-assembly" id="convToolAssembly">
+    <div class="lc-chips" id="convChipsFV">
+      <div class="lc-chip lc-chip-c paused"></div>
+      <div class="lc-chip lc-chip-c paused"></div>
+      <div class="lc-chip lc-chip-l paused"></div>
+      <div class="lc-chip lc-chip-c paused"></div>
+      <div class="lc-chip lc-chip-l paused"></div>
+    </div>
+    <div class="lc-coolant" id="convCoolantFV">
+      <div class="lc-coolant-jet"></div><div class="lc-coolant-jet"></div>
+    </div>
+    <div class="lc-sparks" id="convSparksFV">
+      <div class="lc-spark"></div><div class="lc-spark"></div><div class="lc-spark"></div>
+      <div class="lc-spark"></div><div class="lc-spark"></div><div class="lc-spark"></div>
+    </div>
+    <div class="lc-insert" id="convInsert"></div>
+    <div class="lc-insert-arm"></div>
+  </div>
+  <div class="lc-handwheel lc-hw-carriage" id="convHWLong"><div class="lc-hw-hub"></div></div>
+  <div class="lc-handwheel lc-hw-cross" id="convHWTrans"><div class="lc-hw-hub"></div></div>
+  <div class="lc-gear-box"><div class="lc-gear-knob" id="convGearKnob"></div></div>
+  <div class="lc-tailstock"><div class="lc-ts-quill"></div><div class="lc-ts-hw"></div></div>
+    <!-- Lámpara de trabajo -->
+  <div class="lc-work-lamp" id="convLamp">
+    <div class="lc-work-lamp-beam" id="convLampBeam"></div>
+    <div class="lc-work-lamp-tip" id="convLampTip"></div>
+  </div>
+  <!-- Temperatura -->
+  <div class="lc-temp-display" id="convTempDisp">
+    <div class="lc-temp-value" id="convTempVal">025</div>
+  </div>
+  <!-- Manómetro -->
+  <div class="lc-pressure-gauge" id="convPressGauge">
+    <div class="lc-pressure-needle" id="convPressNeedle"></div>
+    <div class="lc-pressure-cap"></div>
+  </div>
+  <!-- Desgaste herramienta -->
+  <div class="lc-wear-indicator" id="convWearInd">
+    <div class="lc-wear-label">DESGASTE</div>
+    <div class="lc-wear-bar-bg"><div class="lc-wear-bar-fill" id="convWearFill"></div></div>
+    <div class="lc-wear-pct" id="convWearPct">15%</div>
+  </div>
+  <!-- Vibrómetro -->
+  <div class="lc-vibro" id="convVibro">
+    <div class="lc-vibro-value" id="convVibroVal">0.00</div>
+    <div class="lc-vibro-wave"><div class="lc-vibro-line" id="convVibroLine"></div></div>
+  </div>
+  <!-- Posición Z -->
+  <div class="lc-encoder" id="convEncoder">
+    <div class="lc-encoder-value" id="convEncoderVal">Z+000.00</div>
+  </div>
+  <!-- Contador de piezas -->
+  <div class="lc-conv-counter" id="convCounter">PC:001</div>
+  <!-- Modo manual -->
+  <div class="lc-cut-mode-indicator">
+    <div class="lc-cut-mode-text" id="convCutMode">MANUAL — EN ESPERA</div>
+  </div>
+  <!-- Protector de viruta -->
+  <div class="lc-guard"></div>
+
+  <div class="lc-rpm-display" id="convRpmDisplay">500 RPM</div>
+</div>
 
                     <div class="stats-panel">
-                        <div class="stat-bubble" id="convVcBubble">
-                            <div class="stat-label">Vc Result.</div>
-                            <div class="stat-value" id="convVcStat">78.5</div>
-                            <div class="stat-unit">m/min</div>
+                        <div class="stat-mini" id="convVcBubble">
+                            <div class="stat-mini-dot"></div>
+                            <div class="stat-mini-label">Vc Result.</div>
+                            <div class="stat-mini-value" id="convVcStat">78.5</div>
+                            <div class="stat-mini-unit">m/min</div>
                         </div>
-                        <div class="stat-bubble" id="convMRRBubble">
-                            <div class="stat-label">MRR</div>
-                            <div class="stat-value" id="convMRRStat">0.0</div>
-                            <div class="stat-unit">cm³/min</div>
+                        <div class="stat-mini" id="convMRRBubble">
+                            <div class="stat-mini-dot"></div>
+                            <div class="stat-mini-label">MRR</div>
+                            <div class="stat-mini-value" id="convMRRStat">0.00</div>
+                            <div class="stat-mini-unit">cm³/min</div>
                         </div>
-                        <div class="stat-bubble warning" id="convStatusBubble">
-                            <div class="stat-label">Estado</div>
-                            <div class="stat-value warning" id="convStatusStat">BAJO</div>
+                        <div class="stat-mini warn" id="convStatusBubble">
+                            <div class="stat-mini-dot"></div>
+                            <div class="stat-mini-label">Estado</div>
+                            <div class="stat-mini-value warn" id="convStatusStat">BAJO</div>
+                        </div>
+                    </div>
+                    <!-- Fila 2: parámetros adicionales -->
+                    <div class="stats-panel-row2">
+                        <div class="stat-mini" id="convFeedStatCard">
+                            <div class="stat-mini-dot"></div>
+                            <div class="stat-mini-label">Avance (f)</div>
+                            <div class="stat-mini-value" id="convFeedStat">0.25</div>
+                            <div class="stat-mini-unit">mm/rev</div>
+                        </div>
+                        <div class="stat-mini" id="convDepthStatCard">
+                            <div class="stat-mini-dot"></div>
+                            <div class="stat-mini-label">Prof. corte (ap)</div>
+                            <div class="stat-mini-value" id="convDepthStat">2.0</div>
+                            <div class="stat-mini-unit">mm</div>
+                        </div>
+                        <div class="stat-mini" id="convRpmStatCard">
+                            <div class="stat-mini-dot"></div>
+                            <div class="stat-mini-label">RPM husillo</div>
+                            <div class="stat-mini-value" id="convRpmStat2">500</div>
+                            <div class="stat-mini-unit">rev/min</div>
+                        </div>
+                        <div class="stat-mini" id="convRaStatCard">
+                            <div class="stat-mini-dot"></div>
+                            <div class="stat-mini-label">Ra teórico</div>
+                            <div class="stat-mini-value" id="convRaStat">—</div>
+                            <div class="stat-mini-unit">μm</div>
                         </div>
                     </div>
 
@@ -3448,7 +4344,6 @@ AUTO</div>
 
     <script>
         // Material data with valid ranges
-// Material data - ACTUALIZADO para coincidir con página de velocidades
         const materialDataCNC = {
             steel: { name: 'Acero Dulce (1018/1020)', vcMin: 160, vcMax: 250, hardness: 'medium', sparks: false },
             steel_1045: { name: 'Acero al Carbono Medio (1045)', vcMin: 140, vcMax: 220, hardness: 'medium', sparks: false },
@@ -3579,8 +4474,24 @@ AUTO</div>
             document.getElementById('cncSpeedRange').textContent = `${material.vcMin}-${material.vcMax} m/min`;
             
             updateCNC();
+            wearAccum['cnc'] = 5 + Math.random() * 10;
         }
-
+function updateMiniCard(cardId, valId, ranges, value) {
+    const card = document.getElementById(cardId);
+    const valEl = document.getElementById(valId);
+    if (!card || !valEl) return;
+    let cls = 'ok';
+    if (value < ranges.ok[0] || value > ranges.ok[1]) {
+        // fuera del óptimo
+        if (value < ranges.warn[0] || value > ranges.warn[1]) {
+            cls = 'danger';
+        } else {
+            cls = 'warn';
+        }
+    }
+    card.className = 'stat-mini ' + cls;
+    valEl.className = 'stat-mini-value ' + cls;
+}
         // CNC update
         function updateCNC() {
             let feed = parseFloat(document.getElementById('cncFeed').value);
@@ -3634,11 +4545,42 @@ AUTO</div>
             document.getElementById('cncRPMStat').textContent = rpm;
             document.getElementById('cncMRRStat').textContent = mrr;
             document.getElementById('cncStatusStat').textContent = status;
+            // Fila 2
+            document.getElementById('cncFeedStat').textContent = feed.toFixed(2);
+            document.getElementById('cncDepthStat').textContent = depth.toFixed(1);
+            document.getElementById('cncVcStat2').textContent = speed;
+            // Ra teórico = f² / (32 * r_punta); asumimos r_punta=0.8mm
+            const raCNC = ((feed * feed) / (32 * 0.8) * 1000).toFixed(2);
+            document.getElementById('cncRaStat').textContent = raCNC;
+            // Semáforos tarjetas fila 2
+            updateMiniCard('cncFeedStatCard', 'cncFeedStat',
+                currentMode === 'desbaste'
+                    ? { ok: [0.25, 0.60], warn: [0.18, 0.70] }
+                    : { ok: [0.05, 0.20], warn: [0.03, 0.25] },
+                feed);
+            updateMiniCard('cncDepthStatCard', 'cncDepthStat',
+                currentMode === 'desbaste'
+                    ? { ok: [2.0, 8.0], warn: [1.0, 10.0] }
+                    : { ok: [0.1, 0.5], warn: [0.05, 0.8] },
+                depth);
+            updateMiniCard('cncVcStatCard', 'cncVcStat2',
+                { ok: [material.vcMin, material.vcMax],
+                  warn: [material.vcMin * 0.85, material.vcMax * 1.15] },
+                speed);
+            updateMiniCard('cncRaStatCard', 'cncRaStat',
+                currentMode === 'desbaste'
+                    ? { ok: [3.2, 25], warn: [1.6, 50] }
+                    : { ok: [0.4, 3.2], warn: [0.2, 6.3] },
+                parseFloat(raCNC));
+
             
             const statusEl = document.getElementById('cncStatusStat');
             const statusBubble = document.getElementById('cncStatusBubble');
-            statusEl.className = 'stat-value ' + statusClass;
-            statusBubble.className = 'stat-bubble ' + statusClass;
+            const cncSClass = statusClass === 'optimal' ? 'ok' : statusClass === 'warning' ? 'warn' : 'danger';
+            statusEl.className = 'stat-mini-value ' + cncSClass;
+            statusBubble.className = 'stat-mini ' + cncSClass;
+            document.getElementById('cncRPMBubble').className = 'stat-mini';
+            document.getElementById('cncMRRBubble').className = 'stat-mini';
             
             document.getElementById('cncAlertOptimal').classList.toggle('show', status === 'ÓPTIMO');
             document.getElementById('cncAlertWarning').classList.toggle('show', warnings.length > 0 && dangers.length === 0);
@@ -3654,18 +4596,18 @@ AUTO</div>
             const rotationSpeed = speed / 150;
             const chipIntensity = feed * depth * speed / 120;
             
-            updateVisualization('cnc', feed, depth, rotationSpeed, chipIntensity, material);
+            updateVisualization('cnc', feed, depth, speed, rpm, material);
             updateCNCScreen(speed, feed, rpm);
         }
 
         // Conventional update
-        function updateConv() {
+function updateConv() {
             const feed = parseFloat(document.getElementById('convFeed').value);
             const depth = parseFloat(document.getElementById('convDepth').value);
             const rpm = parseInt(document.getElementById('convRPM').value);
             
             currentConvMaterial = document.getElementById('convMaterial').value;
-            const material = materialDataConv[currentConvMaterial];
+            const material = materialDataConv[currentConvMaterial] || materialDataCNC[currentConvMaterial];
             
             const diameter = 50;
             const vc = ((Math.PI * diameter * rpm) / 1000).toFixed(1);
@@ -3709,11 +4651,39 @@ AUTO</div>
             document.getElementById('convVcStat').textContent = vc;
             document.getElementById('convMRRStat').textContent = mrr;
             document.getElementById('convStatusStat').textContent = status;
+            // Fila 2
+            document.getElementById('convFeedStat').textContent = feed.toFixed(2);
+            document.getElementById('convDepthStat').textContent = depth.toFixed(1);
+            document.getElementById('convRpmStat2').textContent = rpm;
+            const raConv = ((feed * feed) / (32 * 0.8) * 1000).toFixed(2);
+            document.getElementById('convRaStat').textContent = raConv;
+            // Semáforos fila 2
+            updateMiniCard('convFeedStatCard', 'convFeedStat',
+                currentMode === 'desbaste'
+                    ? { ok: [0.25, 0.60], warn: [0.18, 0.70] }
+                    : { ok: [0.05, 0.20], warn: [0.03, 0.25] },
+                feed);
+            updateMiniCard('convDepthStatCard', 'convDepthStat',
+                currentMode === 'desbaste'
+                    ? { ok: [2.0, 8.0], warn: [1.0, 10.0] }
+                    : { ok: [0.1, 0.5], warn: [0.05, 0.8] },
+                depth);
+            updateMiniCard('convRpmStatCard', 'convRpmStat2',
+                { ok: [200, 1500], warn: [100, 2000] },
+                rpm);
+            updateMiniCard('convRaStatCard', 'convRaStat',
+                currentMode === 'desbaste'
+                    ? { ok: [3.2, 25], warn: [1.6, 50] }
+                    : { ok: [0.4, 3.2], warn: [0.2, 6.3] },
+                parseFloat(raConv));
             
             const statusEl = document.getElementById('convStatusStat');
             const statusBubble = document.getElementById('convStatusBubble');
-            statusEl.className = 'stat-value ' + statusClass;
-            statusBubble.className = 'stat-bubble ' + statusClass;
+            const convSClass = statusClass === 'optimal' ? 'ok' : statusClass === 'warning' ? 'warn' : 'danger';
+            statusEl.className = 'stat-mini-value ' + convSClass;
+            statusBubble.className = 'stat-mini ' + convSClass;
+            document.getElementById('convVcBubble').className = 'stat-mini';
+            document.getElementById('convMRRBubble').className = 'stat-mini';
             
             document.getElementById('convAlertOptimal').classList.toggle('show', status === 'ÓPTIMO');
             document.getElementById('convAlertWarning').classList.toggle('show', warnings.length > 0 && dangers.length === 0);
@@ -3726,94 +4696,439 @@ AUTO</div>
                 document.getElementById('convDangerText').textContent = dangers.join('. ');
             }
             
-            const rotationSpeed = rpm / 400;
-            const chipIntensity = feed * depth * rpm / 250;
-            
-            updateVisualization('conv', feed, depth, rotationSpeed, chipIntensity, material);
-            
-            const wheelLong = document.getElementById('convWheelLong');
-            const wheelTrans = document.getElementById('convWheelTrans');
-            if (chipIntensity > 12) {
-                wheelLong.classList.add('spinning');
-                wheelTrans.classList.add('spinning');
-            } else {
-                wheelLong.classList.remove('spinning');
-                wheelTrans.classList.remove('spinning');
-            }
+            updateVisualization('conv', feed, depth, parseFloat(vc), rpm, material);
         }
 
         // Update visualization
-        function updateVisualization(type, feed, depth, rotationSpeed, chipIntensity, material) {
-            const workpiece = document.getElementById(type + 'Workpiece');
-            const toolPost = document.getElementById(type + 'ToolPost');
-            const cuttingTool = document.getElementById(type + 'CuttingTool');
-            const chips = document.getElementById(type + 'Chips');
-            const coolant = document.getElementById(type + 'Coolant');
-            const sparks = document.getElementById(type + 'Sparks');
-            
-            // Rotation effect
-            if (chipIntensity > 15) {
-                workpiece.classList.add('spinning');
-                workpiece.classList.add('cutting');
-            } else {
-                workpiece.classList.remove('cutting');
-            }
-            
-            // Tool position
-            const basePosition = 48;
-            const toolPosition = basePosition + Math.min(depth * 0.8, 8);
-            toolPost.style.left = toolPosition + '%';
-            
-            // Cutting effects
-            if (chipIntensity > 18) {
-                cuttingTool.classList.add('active');
-                toolPost.classList.add('cutting');
-            } else {
-                cuttingTool.classList.remove('active');
-                toolPost.classList.remove('cutting');
-            }
-            
-            // Chips
-            const chipElements = chips.querySelectorAll('.chip');
-            const activeChips = Math.min(5, Math.floor(chipIntensity / 10) + 1);
-            
-            chipElements.forEach((chip, index) => {
-                if (index < activeChips) {
-                    chip.style.display = 'block';
-                    chip.style.animationDuration = Math.max(0.8, (1.5 / (feed * 3 + 0.5))) + 's';
-                } else {
-                    chip.style.display = 'none';
-                }
-            });
-            
-            // Coolant
-            if (material.hardness === 'hard' || material.hardness === 'very_hard' || chipIntensity > 35) {
-                coolant.classList.add('active');
-            } else {
-                coolant.classList.remove('active');
-            }
-            
-            // Sparks
-            if (material.sparks && chipIntensity > 15) {
-                sparks.classList.add('active');
-            } else {
-                sparks.classList.remove('active');
-            }
+// ========= PARTICLE SYSTEM =========
+const particleSystems = {};
+
+function getOrCreateParticleSystem(type) {
+    if (particleSystems[type]) return particleSystems[type];
+    const canvas = document.getElementById(type + 'ParticleCanvas');
+    if (!canvas) return null;
+    const parent = canvas.closest('.lathe-canvas');
+    canvas.width = parent.offsetWidth;
+    canvas.height = parent.offsetHeight;
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    particleSystems[type] = { canvas, ctx, particles, active: false };
+    return particleSystems[type];
+}
+
+function resizeParticleCanvases() {
+    ['cnc','conv'].forEach(type => {
+        const sys = particleSystems[type];
+        if (!sys) return;
+        const parent = sys.canvas.closest('.lathe-canvas');
+        sys.canvas.width  = parent.offsetWidth;
+        sys.canvas.height = parent.offsetHeight;
+    });
+}
+window.addEventListener('resize', resizeParticleCanvases);
+
+// Particle types
+function createParticle(type, x, y, opts) {
+    return {
+        type,
+        x, y,
+        vx: opts.vx || 0,
+        vy: opts.vy || 0,
+        life: opts.life || 1,
+        maxLife: opts.life || 1,
+        size: opts.size || 3,
+        color: opts.color || '#ff8800',
+        gravity: opts.gravity || 0.08,
+        drag: opts.drag || 0.97,
+        glow: opts.glow || 0,
+        spin: (Math.random() - .5) * .3,
+        angle: opts.angle || 0,
+    };
+}
+
+function spawnParticles(sys, x, y, feed, depth, vc, material, mrr) {
+    const isActive = feed > 0.03 && depth > 0.03 && vc > 3;
+    if (!isActive) return;
+
+    const hardness = material ? material.hardness : 'medium';
+    const now = Date.now();
+
+    // === METAL CHIPS ===
+    const chipRate = Math.min(3, mrr * 14 + .5);
+    if (Math.random() < chipRate * .18) {
+        const chipColor = hardness === 'soft'      ? '#a8c4c8'
+                        : hardness === 'very_hard' ? '#4a4850'
+                        : hardness === 'hard'      ? '#887060'
+                        :                            '#8a9868';
+        const speed = 1.8 + feed * 3 + Math.random() * 2;
+        const angle = -Math.PI * .6 - Math.random() * .7;
+        sys.particles.push(createParticle('chip', x, y, {
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - .5,
+            life: 60 + Math.random() * 40,
+            size: 2.5 + depth * .4 + Math.random() * 2,
+            color: chipColor,
+            gravity: .06,
+            drag: .96,
+            glow: 0,
+        }));
+    }
+
+    // === HEAT PARTICLES ===
+    if (mrr > 0.08 && Math.random() < mrr * 3) {
+        const heatColor = mrr > .5 ? '#ff4400'
+                        : mrr > .2 ? '#ff8800'
+                        :            '#ffcc44';
+        sys.particles.push(createParticle('heat', x, y, {
+            vx: (Math.random() - .5) * .8,
+            vy: -(.5 + Math.random() * 1.2),
+            life: 30 + Math.random() * 25,
+            size: 2 + mrr * 4 + Math.random() * 3,
+            color: heatColor,
+            gravity: -.008,
+            drag: .96,
+            glow: 2,
+        }));
+    }
+
+    // === SPARKS ===
+    if (material && material.sparks && mrr > 0.005) {
+        if (Math.random() < Math.min(.9, mrr * 20)) {
+            const sparkSpeed = 2.5 + Math.random() * 4;
+            const sparkAngle = -Math.PI * .8 + Math.random() * Math.PI * .6;
+            sys.particles.push(createParticle('spark', x, y, {
+                vx: Math.cos(sparkAngle) * sparkSpeed,
+                vy: Math.sin(sparkAngle) * sparkSpeed,
+                life: 20 + Math.random() * 20,
+                size: 1.5 + Math.random() * 1.5,
+                color: Math.random() < .5 ? '#ffe866' : '#ffcc22',
+                gravity: .12,
+                drag: .94,
+                glow: 4,
+            }));
+        }
+    }
+
+    // === COOLANT DROPLETS ===
+    const needCoolant = material && (material.hardness === 'hard' || material.hardness === 'very_hard' || mrr > .28);
+    if (needCoolant && Math.random() < .3) {
+        sys.particles.push(createParticle('coolant', x - 8, y - 30, {
+            vx: (Math.random() - .5) * .6,
+            vy: .5 + Math.random() * 1.5,
+            life: 25 + Math.random() * 15,
+            size: 1.5 + Math.random() * 2,
+            color: `rgba(${60 + Math.random()*40|0},${160 + Math.random()*60|0},255,.8)`,
+            gravity: .1,
+            drag: .97,
+            glow: 1,
+        }));
+    }
+
+    // Trim if too many
+    if (sys.particles.length > 280) {
+        sys.particles.splice(0, sys.particles.length - 280);
+    }
+}
+
+function updateParticles(sys) {
+    const { ctx, canvas, particles } = sys;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.life--;
+        if (p.life <= 0) { particles.splice(i, 1); continue; }
+
+        p.vx = p.vx * p.drag;
+        p.vy = p.vy * p.drag + p.gravity;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.angle += p.spin;
+
+        const alpha = p.life / p.maxLife;
+
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+
+        if (p.glow > 0) {
+            ctx.shadowBlur  = p.glow * 4 * alpha;
+            ctx.shadowColor = p.color;
         }
 
-        // Update CNC screen
+        if (p.type === 'chip') {
+            // Draw curled chip
+            ctx.beginPath();
+            ctx.ellipse(0, 0, p.size, p.size * .5, 0, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            // Highlight on chip
+            ctx.beginPath();
+            ctx.ellipse(-p.size*.2, -p.size*.15, p.size*.4, p.size*.2, 0, 0, Math.PI);
+            ctx.fillStyle = 'rgba(255,255,255,.25)';
+            ctx.fill();
+        } else if (p.type === 'spark') {
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            // Spark trail
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-p.vx * 4, -p.vy * 4);
+            ctx.strokeStyle = p.color;
+            ctx.lineWidth = p.size * .5;
+            ctx.globalAlpha = alpha * .4;
+            ctx.stroke();
+        } else if (p.type === 'heat') {
+            const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size);
+            grad.addColorStop(0, p.color);
+            grad.addColorStop(1, 'transparent');
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+        } else if (p.type === 'coolant') {
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            // Droplet glint
+            ctx.beginPath();
+            ctx.arc(-p.size*.25, -p.size*.25, p.size*.3, 0, Math.PI*2);
+            ctx.fillStyle = 'rgba(255,255,255,.5)';
+            ctx.fill();
+        }
+
+        ctx.restore();
+    }
+}
+
+// Main particle loop
+let particleLoopRunning = false;
+function startParticleLoop() {
+    if (particleLoopRunning) return;
+    particleLoopRunning = true;
+    function loop() {
+        ['cnc','conv'].forEach(type => {
+            const sys = particleSystems[type];
+            if (sys) updateParticles(sys);
+        });
+        requestAnimationFrame(loop);
+    }
+    loop();
+}
+
+// =========================================
+// STORE last params per type for particle emission
+const lastParams = {};
+
+function updateVisualization(type, feed, depth, vc, rpm, material) {
+    const canvas = document.getElementById(type + 'Canvas');
+    if (!canvas) return;
+    const cs = getComputedStyle(canvas);
+    const spindleY = parseFloat(cs.getPropertyValue('--lc-spindle')) || 168;
+    const wpR      = parseFloat(cs.getPropertyValue('--lc-wp-r'))    || 29;
+
+    const isActive = feed > 0.03 && depth > 0.03 && (vc > 3 || rpm > 30);
+    const mrr      = (vc * feed * depth) / 1000;
+
+    // Store for particle system
+    lastParams[type] = { feed, depth, vc, rpm, material, mrr, isActive, spindleY, wpR };
+
+    // === 1. Chuck spin (RPM-driven) ===
+    const chuck = document.getElementById(type + 'Chuck');
+    if (chuck) {
+        if (isActive && rpm > 0) {
+            const dur = Math.max(0.05, 60 / rpm).toFixed(3);
+            chuck.style.animationDuration = dur + 's';
+            chuck.classList.add('spinning');
+        } else {
+            chuck.classList.remove('spinning');
+        }
+    }
+
+    // === 2. Workpiece rotation lines ===
+    const wpEl    = document.getElementById(type + 'Workpiece');
+    const wpLines = document.getElementById(type + 'WpLines');
+    if (wpEl) {
+        wpEl.classList.toggle('spinning', isActive);
+        if (isActive && wpLines) {
+            const spinDur = Math.max(0.05, 1.6 - vc / 600).toFixed(3);
+            wpLines.style.animationDuration = spinDur + 's';
+        }
+    }
+
+    // === 3. Tool depth positioning ===
+    const toolAsm = document.getElementById(type + 'ToolAssembly');
+    if (toolAsm) {
+        const maxDepthMm = 8.0;
+        const apPx = (depth / maxDepthMm) * wpR * 0.80;
+        const apClamped = Math.min(wpR * 0.80, apPx);
+        toolAsm.style.top = (spindleY + wpR - apClamped) + 'px';
+        toolAsm.classList.toggle('cutting', isActive);
+    }
+
+    // === 4. Carriage feed motion ===
+    const carriage = document.getElementById(type + 'Carriage');
+    if (carriage) carriage.classList.toggle('cutting', isActive);
+
+    // === 5. Insert glow (material-dependent color) ===
+    const insert = document.getElementById(type + 'Insert');
+    if (insert) {
+        insert.classList.toggle('active', isActive);
+        if (isActive) {
+            const col = material.hardness === 'very_hard' ? '#ff2200'
+                      : material.hardness === 'hard'      ? '#ff5500'
+                      : material.hardness === 'soft'      ? '#ffd000'
+                      :                                      '#ff8822';
+            insert.style.borderBottomColor = col;
+        }
+    }
+
+    // === 6. PLASMA ARC at contact point ===
+    const plasma = document.getElementById(type + 'Plasma');
+    if (plasma) plasma.classList.toggle('active', isActive);
+
+    // === 7. Electrical ARC (very hard / high MRR) ===
+    const arc = document.getElementById(type + 'Arc');
+    if (arc) arc.classList.toggle('active',
+        isActive && (material.hardness === 'very_hard') && mrr > .01);
+
+    // === 8. Machined section ===
+    const machined  = document.getElementById(type + 'Machined');
+    const shoulder  = document.getElementById(type + 'Shoulder');
+    if (machined) {
+        machined.classList.toggle('active', isActive);
+        const shrink = Math.min(10, depth * 1.8);
+        machined.style.top    = (4 + shrink) + 'px';
+        machined.style.bottom = (4 + shrink) + 'px';
+    }
+    if (shoulder) shoulder.classList.toggle('active', isActive);
+
+    // === 9. CSS Chips (backup, real chips via particles) ===
+    const chipsEl = document.getElementById(type + 'ChipsFV');
+    if (chipsEl) {
+        const count = isActive ? Math.min(5, Math.max(1, Math.ceil(mrr * 20 + 1))) : 0;
+        const chipSpd = Math.max(0.3, 1.2 - feed * 1.4).toFixed(2);
+        const chipColor = material.hardness === 'soft'
+            ? 'linear-gradient(90deg,#b0c8d0 0%,#d8eef4 50%,#b0c8d0 100%)'
+            : material.hardness === 'very_hard'
+            ? 'linear-gradient(90deg,#38363a 0%,#585258 50%,#38363a 100%)'
+            : '';
+        chipsEl.querySelectorAll('.lc-chip').forEach((c, i) => {
+            if (i < count) {
+                c.classList.remove('paused');
+                c.style.animationDuration = chipSpd + 's';
+                if (chipColor) c.style.background = chipColor;
+                else c.style.background = '';
+            } else {
+                c.classList.add('paused');
+            }
+        });
+    }
+
+    // === 10. Coolant ===
+    const coolant       = document.getElementById(type + 'CoolantFV');
+    const coolantNozzle = document.getElementById(type + 'CoolantNozzle');
+    const needCoolant = isActive && (
+        material.hardness === 'hard' || material.hardness === 'very_hard' || mrr > 0.28);
+    if (coolant)       coolant.classList.toggle('active', needCoolant);
+    if (coolantNozzle) coolantNozzle.classList.toggle('active', needCoolant);
+
+    // === 11. CSS Sparks (backup) ===
+    const sparks = document.getElementById(type + 'SparksFV');
+    if (sparks) sparks.classList.toggle('active', isActive && !!material.sparks && mrr > 0.005);
+
+    // === 12. Workpiece heat glow ===
+    const heat = document.getElementById(type + 'WpHeat');
+    if (heat) {
+        heat.className = 'lc-wp-heat';
+        if (isActive) {
+            if (mrr > .5 || material.hardness === 'very_hard') heat.classList.add('hot');
+            else if (mrr > .08) heat.classList.add('warm');
+        }
+    }
+
+    // === 13. Heat shimmer ===
+    const shimmer = document.getElementById(type + 'HeatShimmer');
+    if (shimmer) shimmer.classList.toggle('active', isActive && mrr > .15);
+
+    // === 14. Ambient glow ===
+    const ambient = document.getElementById(type + 'Ambient');
+    if (ambient) {
+        ambient.className = 'lc-ambient';
+        if (isActive) ambient.classList.add(mrr > .4 ? 'hot' : 'cutting');
+    }
+
+    // === 15. Floor reflection ===
+    const floorRefl = document.getElementById(type + 'FloorReflect');
+    if (floorRefl) floorRefl.classList.toggle('active', isActive && mrr > .1);
+
+    // === 16. Chip pile ===
+    const pile = document.getElementById(type + 'ChipPile');
+    if (pile) pile.classList.toggle('active', isActive && mrr > 0.04);
+
+    // === 17. CNC turret LED ===
+    const turretLed = document.getElementById('cncTurretLed');
+    if (turretLed) turretLed.classList.toggle('active', type === 'cnc' && isActive);
+
+    // === 18. Headstock LED strip ===
+    const hsLed = document.getElementById(type + 'HsLedStrip');
+    if (hsLed) hsLed.classList.toggle('active', isActive);
+
+    // === 19. Conventional-specific ===
+    if (type === 'conv') {
+        const hwL   = document.getElementById('convHWLong');
+        const hwT   = document.getElementById('convHWTrans');
+        const lever = document.getElementById('convFeedLever');
+        const rpmDp = document.getElementById('convRpmDisplay');
+        const gear  = document.getElementById('convGearKnob');
+        if (hwL) {
+            hwL.classList.toggle('spinning', isActive);
+            if (isActive && rpm > 0) {
+                hwL.style.animationDuration = Math.max(.15, 3 - rpm/1000).toFixed(2) + 's';
+            }
+        }
+        if (hwT) hwT.classList.toggle('spinning', isActive && depth > 0.2);
+        if (lever) lever.classList.toggle('engaged', isActive);
+        if (rpmDp) {
+            rpmDp.textContent = rpm + ' RPM';
+            rpmDp.style.color = rpm > 1500 ? '#ff6030'
+                               : rpm < 200  ? '#80a0ff'
+                               :              '#f0c040';
+            rpmDp.style.textShadow = rpm > 1500
+                ? '0 0 8px rgba(255,80,30,.8)' : '';
+        }
+        if (gear) {
+            gear.style.transform = 'translateX(-50%) rotate(' + (rpm * .5 % 360) + 'deg)';
+        }
+    }
+
+    // === 20. Particle system ===
+    const sys = getOrCreateParticleSystem(type);
+    if (sys) {
+        sys.active = isActive;
+        // Compute tool contact point in canvas coordinates
+        if (isActive && toolAsm) {
+            const canvasRect  = canvas.getBoundingClientRect();
+            const toolRect    = toolAsm.getBoundingClientRect();
+            const px = toolRect.left - canvasRect.left + toolRect.width / 2;
+            const py = toolRect.top  - canvasRect.top;
+            spawnParticles(sys, px, py, feed, depth, vc, material, mrr);
+        }
+        startParticleLoop();
+    }
+        // === 21. Nuevos instrumentos ===
+    updateNewElements(type, feed, depth, vc, rpm, material, mrr, isActive);
+}
+// Update CNC screen
         function updateCNCScreen(vc, feed, rpm) {
-            const screenVc = document.getElementById('screenVc');
-            const screenFeed = document.getElementById('screenFeed');
-            const screenRPM = document.getElementById('screenRPM');
-            const screenX = document.getElementById('screenX');
-            const screenZ = document.getElementById('screenZ');
-            
-            if (screenVc) screenVc.textContent = vc;
-            if (screenFeed) screenFeed.textContent = feed.toFixed(2);
-            if (screenRPM) screenRPM.textContent = rpm;
-            if (screenX) screenX.textContent = (50 - Math.random() * 2).toFixed(1);
-            if (screenZ) screenZ.textContent = (100 - Math.random() * 5).toFixed(1);
+            const el = document.getElementById('cncScreenFV');
+            if (!el) return;
+            const xPos = (50 - Math.random() * 0.3).toFixed(3);
+            el.textContent = 'G96 S' + vc + '\nF' + feed.toFixed(2) + '\nX' + xPos + ' Z0.000\nRPM: ' + rpm;
         }
 
         // Material search
@@ -3846,12 +5161,225 @@ AUTO</div>
 
             noResults.style.display = found ? "none" : "block";
         });
+const wearAccum = { cnc: 15, conv: 15 }; // % desgaste acumulado
+const encoderPos = { cnc: 0, conv: 0 };
+let convPieceCount = 1;
 
+function updateNewElements(type, feed, depth, vc, rpm, material, mrr, isActive) {
+
+    // --- TEMPERATURA ---
+    const tempVal = document.getElementById(type + 'TempVal');
+    const tempDisp = document.getElementById(type + 'TempDisp');
+    if (tempVal) {
+        let temp = 25;
+        if (isActive) {
+            // Temperatura basada en MRR + material hardness
+            const heatFactor = material.hardness === 'very_hard' ? 3.2
+                             : material.hardness === 'hard'      ? 2.4
+                             : material.hardness === 'medium-hard' ? 1.8
+                             : material.hardness === 'soft'      ? 0.9 : 1.4;
+            temp = Math.round(25 + mrr * 1200 * heatFactor + Math.random() * 8);
+            temp = Math.min(1200, temp);
+        }
+        tempVal.textContent = String(temp).padStart(3, '0');
+        tempVal.className = 'lc-temp-value' +
+            (temp > 600 ? ' hot' : temp > 200 ? ' warm' : '');
+    }
+
+    // --- MANÓMETRO (presión refrigerante) ---
+    const pressNeedle = document.getElementById(type + 'PressNeedle');
+    if (pressNeedle) {
+        const needCoolant = isActive && (
+            material.hardness === 'hard' || material.hardness === 'very_hard' || mrr > .28);
+        // -60° = 0 bar, +90° = max bar
+        const pressureRot = needCoolant
+            ? Math.round(-60 + Math.min(150, mrr * 500 + 80) + Math.random() * 6)
+            : -55 + Math.random() * 4;
+        pressNeedle.style.transform =
+            'translateX(-50%) rotate(' + pressureRot + 'deg)';
+    }
+
+    // --- DESGASTE DE HERRAMIENTA ---
+    const wearFill = document.getElementById(type + 'WearFill');
+    const wearPct  = document.getElementById(type + 'WearPct');
+    if (wearFill && isActive) {
+        // Desgaste acumula lentamente con MRR y dureza del material
+        const wearRate = mrr * 0.003 *
+            (material.hardness === 'very_hard' ? 5
+           : material.hardness === 'hard'      ? 3
+           : material.hardness === 'medium-hard'? 1.8
+           :                                      1);
+        wearAccum[type] = Math.min(100, wearAccum[type] + wearRate);
+        const w = wearAccum[type];
+        wearFill.style.width = w.toFixed(0) + '%';
+        wearFill.className   = 'lc-wear-bar-fill' +
+            (w > 75 ? ' high' : w > 45 ? ' medium' : '');
+        if (wearPct) wearPct.textContent = w.toFixed(0) + '%';
+    }
+
+    // --- VIBRÓMETRO ---
+    const vibroVal  = document.getElementById(type + 'VibroVal');
+    const vibroLine = document.getElementById(type + 'VibroLine');
+    if (vibroVal) {
+        let vibro = 0.00;
+        if (isActive) {
+            // Vibración proporcional a feed, depth, y opuesto a rigidez
+            const base = feed * depth * 0.8 + (vc > 300 ? .05 : 0);
+            vibro = Math.max(0, base + (Math.random() - .45) * base * .4);
+            vibro = Math.min(9.99, vibro);
+        }
+        vibroVal.textContent = vibro.toFixed(2);
+        vibroVal.className = 'lc-vibro-value' +
+            (vibro > 3.5 ? ' alarm' : vibro > 1.5 ? ' warn' : '');
+        if (vibroLine) {
+            vibroLine.classList.toggle('active', isActive && vibro > 0.1);
+            if (isActive) {
+                const hue = vibro > 3.5 ? '#ff3300' : vibro > 1.5 ? '#ff9900' : '#4080ff';
+                vibroLine.style.background =
+                    `linear-gradient(90deg, transparent 0%, ${hue} 10%, ${hue} 90%, transparent 100%)`;
+            }
+        }
+    }
+
+    // --- ENCODER POSICIÓN Z ---
+    const encVal = document.getElementById(type + 'EncoderVal');
+    if (encVal && isActive) {
+        encoderPos[type] -= feed * 0.18;
+        if (encoderPos[type] < -250) encoderPos[type] = 0;
+        const pos = encoderPos[type];
+        const sign = pos >= 0 ? '+' : '-';
+        encVal.textContent = 'Z' + sign + Math.abs(pos).toFixed(2).padStart(6, '0');
+    }
+
+    // --- LÁMPARA DE TRABAJO ---
+    const lampBeam = document.getElementById(type + 'LampBeam');
+    const lampTip  = document.getElementById(type + 'LampTip');
+    if (lampBeam) lampBeam.classList.toggle('active', isActive);
+    if (lampTip)  lampTip.classList.toggle('on', isActive);
+
+    // --- MODO DE CORTE ---
+    const cutMode = document.getElementById(type + 'CutMode');
+    if (cutMode) {
+        if (type === 'cnc') {
+            cutMode.textContent = isActive ? 'G96 — CORTANDO' : 'G96 — EN ESPERA';
+            cutMode.className = 'lc-cut-mode-text' + (isActive ? ' active' : '');
+        } else {
+            const warnV = vibroVal ? parseFloat(vibroVal.textContent) : 0;
+            cutMode.textContent = isActive
+                ? (warnV > 3.5 ? '⚠ VIBRACIÓN ALTA' : 'MANUAL — CORTANDO')
+                : 'MANUAL — EN ESPERA';
+            cutMode.className = 'lc-cut-mode-text' + (isActive ? ' active' : '');
+        }
+    }
+
+    // --- CONTADOR CONV ---
+    if (type === 'conv') {
+        const convCtr = document.getElementById('convCounter');
+        if (convCtr && isActive && Math.random() < .0008) {
+            convPieceCount++;
+            convCtr.textContent = 'PC:' + String(convPieceCount).padStart(3,'0');
+        }
+    }
+}
+        // Initialize
+        function updateConvMaterial() {
+            currentConvMaterial = document.getElementById('convMaterial').value;
+            updateConv();
+            wearAccum['conv'] = 5 + Math.random() * 10;
+        }
+// Re-calcular posición de herramienta al redimensionar
+let resizeTimer;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+        // Re-leer CSS vars y recalcular posición tool
+        ['cnc', 'conv'].forEach(function(type) {
+            const canvas = document.getElementById(type + 'Canvas');
+            if (!canvas) return;
+            const cs = getComputedStyle(canvas);
+            const spindleY = parseFloat(cs.getPropertyValue('--lc-spindle')) || 168;
+            const wpR      = parseFloat(cs.getPropertyValue('--lc-wp-r'))    || 29;
+            const toolAsm  = document.getElementById(type + 'ToolAssembly');
+            if (!toolAsm) return;
+
+            // Recuperar profundidad actual del slider
+            const depthSlider = document.getElementById(type === 'cnc' ? 'cncDepth' : 'convDepth');
+            const depth = depthSlider ? parseFloat(depthSlider.value) : 2.0;
+
+            const apPx     = (depth / 8.0) * wpR * 0.80;
+            const apClamped = Math.min(wpR * 0.80, apPx);
+            toolAsm.style.top = (spindleY + wpR - apClamped) + 'px';
+        });
+
+        // Redimensionar canvas de partículas
+        resizeParticleCanvases();
+    }, 120);
+});
         // Initialize
         window.addEventListener('load', function() {
             updateCNC();
             updateConv();
         });
+        function calcRPM() {
+    const PI = Math.PI;
+    const n  = document.getElementById('c_n').value.trim();
+    const vc = document.getElementById('c_vc').value.trim();
+    const d  = document.getElementById('c_d').value.trim();
+    const res   = document.getElementById('rpm_result');
+    const resTxt = document.getElementById('rpm_result_txt');
+    const resForm = document.getElementById('rpm_result_formula');
+    const err   = document.getElementById('rpm_error');
+
+    res.style.display = 'none';
+    err.style.display = 'none';
+
+    const blanks = [n, vc, d].filter(v => v === '').length;
+
+    if (blanks === 0) {
+        err.textContent = 'Deja un campo en "?" (vacío) para calcular.';
+        err.style.display = 'block'; return;
+    }
+    if (blanks > 1) {
+        err.textContent = 'Llena al menos dos campos para poder calcular.';
+        err.style.display = 'block'; return;
+    }
+
+    const nv = parseFloat(n), vcv = parseFloat(vc), dv = parseFloat(d);
+
+    if ((n !== '' && nv <= 0) || (vc !== '' && vcv <= 0) || (d !== '' && dv <= 0)) {
+        err.textContent = 'Los valores deben ser mayores a cero.';
+        err.style.display = 'block'; return;
+    }
+
+    let result, label, unit, formula;
+
+    if (n === '') {
+        result = (1000 * vcv) / (PI * dv);
+        label = 'n'; unit = 'RPM';
+        formula = `(1000 × ${vcv}) / (π × ${dv}) = ${result.toFixed(1)} RPM`;
+        document.getElementById('c_n').value = result.toFixed(1);
+    } else if (vc === '') {
+        result = (PI * dv * nv) / 1000;
+        label = 'Vc'; unit = 'm/min';
+        formula = `(π × ${dv} × ${nv}) / 1000 = ${result.toFixed(2)} m/min`;
+        document.getElementById('c_vc').value = result.toFixed(2);
+    } else {
+        result = (1000 * vcv) / (PI * nv);
+        label = 'D'; unit = 'mm';
+        formula = `(1000 × ${vcv}) / (π × ${nv}) = ${result.toFixed(3)} mm`;
+        document.getElementById('c_d').value = result.toFixed(3);
+    }
+
+    resTxt.textContent  = label + ' = ' + (label === 'D' ? result.toFixed(3) : label === 'Vc' ? result.toFixed(2) : result.toFixed(1)) + ' ' + unit;
+    resForm.textContent = formula;
+    res.style.display = 'block';
+}
+
+function clearRPM() {
+    ['c_n','c_vc','c_d'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('rpm_result').style.display = 'none';
+    document.getElementById('rpm_error').style.display  = 'none';
+}
     </script>
 </body>
 </html>
